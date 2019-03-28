@@ -13,6 +13,13 @@ type Company struct {
 	Name string `json:"Name,omitempty"`
 }
 
+type Student struct{
+	FirstName string `json:"FirstName,omitempty"`
+	LastName string `json:"LastName,omitempty"`
+	Class string `json:"Class,omitempty"` // Freshman, Sophomore, Junior, Senior
+	Major string `json:"Major,omitempty"`
+}
+
 var companyList []Company
 
 func main() {
