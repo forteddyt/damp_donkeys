@@ -1,10 +1,12 @@
 # ignore everything
-*
+/*
+
+# Do not ignore files inside of /dist/frontend
+!/dist
+/dist/*
+!/dist/frontend
 
 # but not these files...
-!.gitignore
-!dist/*
+!/.gitignore
 !README.md
 
-# even if they are in subdirectories
-# !*/
