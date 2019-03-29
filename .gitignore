@@ -1,5 +1,5 @@
 # ignore everything
-/*
+*
 
 # but not these files...
 !.gitignore
@@ -7,4 +7,4 @@
 !README.md
 
 # even if they are in subdirectories
-!*/
+# !*/
