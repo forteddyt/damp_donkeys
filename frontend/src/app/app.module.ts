@@ -9,6 +9,7 @@ import { ReviewScreenComponent } from './components/review-screen/review-screen.
 import { RegistrationCompleteComponent } from './components/registration-complete/registration-complete.component';
 import { CompanyUniqueComponent } from './components/company-unique/company-unique.component';
 import { CompanyWelcomeComponent } from './components/company-welcome/company-welcome.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { CompanyWelcomeComponent } from './components/company-welcome/company-we
     ReviewScreenComponent,
     RegistrationCompleteComponent,
     CompanyUniqueComponent,
-    CompanyWelcomeComponent
+    CompanyWelcomeComponent,
+    AdminComponent
   ],
   imports: [
     BrowserModule,

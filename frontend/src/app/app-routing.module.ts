@@ -6,6 +6,7 @@ import { ReviewScreenComponent } from './components/review-screen/review-screen.
 import { RegistrationCompleteComponent } from './components/registration-complete/registration-complete.component';
 import { CompanyWelcomeComponent } from './components/company-welcome/company-welcome.component';
 import { CompanyUniqueComponent } from './components/company-unique/company-unique.component';
+import { AdminComponent } from './components/admin/admin.component';
 
 const routes: Routes = [
   { path: '', component: SwipeComponent},
@@ -14,6 +15,7 @@ const routes: Routes = [
   { path: 'complete', component: RegistrationCompleteComponent},
   { path: 'employers', component: CompanyWelcomeComponent },
   { path: 'employers/interviews', component: CompanyUniqueComponent },
+  { path: 'admin', component: AdminComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
