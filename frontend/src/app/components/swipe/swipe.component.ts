@@ -26,9 +26,9 @@ export class SwipeComponent implements OnInit {
         this.pid = input.substring(start, start + 9);
       } 
     }
+    event.target.value = this.pid;
     if (this.pid.length == 9 && /^\d+$/.test(this.pid)) {
       //API Call here and move onto next page
     }
-    event.target.value = this.pid;
   }
 }

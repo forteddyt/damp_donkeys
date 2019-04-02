@@ -1,3 +1,9 @@
-<div>
-  <app-swipe></app-swipe>
+<div class="container" ng-app="check">
+  <div class="row">
+    <div class="col-md-9">
+      <div ng-view></div>
+      <app-swipe></app-swipe>
+    </div>
+  </div>
 </div>
+<script src="../page-transition.js"></script>
