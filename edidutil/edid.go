@@ -7,7 +7,7 @@ import (
 )
 
 func ObtainEdidInfo(uid string) {
-    out, err := exec.Command("/bin/sh", "test.sh", uid).Output()
+    out, err := exec.Command("/bin/sh", "edid_call.sh", uid).Output()
     if err != nil {
         log.Fatal(err)
     }
