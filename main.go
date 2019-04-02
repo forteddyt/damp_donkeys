@@ -28,6 +28,7 @@ func main() {
 	router := mux.NewRouter()
 	
 	router.HandleFunc("/company_list", GetCompanyList).Methods("GET")
+	router.HandleFunc("/get_student", GetStudent).Methods("GET")
 	router.HandleFunc("/put_student", PutStudent).Methods("POST")
 	
 	log.Fatal(http.ListenAndServe(":8080", router))
@@ -39,6 +40,14 @@ func GetCompanyList(w http.ResponseWriter, r *http.Request){
 
 	log.Print("Serving companyList")
 	json.NewEncoder(w).Encode(companyList)
+}
+
+func GetStudent(w http.ResponseWriter, r *http.Request){
+	params := r.URL.Query()
+
+	log.Print(params["VT_ID"])
+
+	
 }
 
 func PutStudent(w http.ResponseWriter, r *http.Request){
