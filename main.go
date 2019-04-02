@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"github.com/gorilla/mux"
-	// "exec" // For running perl script to get info from 90 number
+	"server/edidutil"
 )
 
 // Company type information
@@ -24,6 +24,7 @@ var companyList []Company
 
 func main() {
 	log.Print("Starting server...")
+	edidutil.ObtainEdidInfo("906030228")
 
 	router := mux.NewRouter()
 	
@@ -47,7 +48,7 @@ func GetStudent(w http.ResponseWriter, r *http.Request){
 
 	log.Print(params["VT_ID"])
 
-	
+	edidutil.ObtainEdidInfo(params["VT_ID"][0])
 }
 
 func PutStudent(w http.ResponseWriter, r *http.Request){
