@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"github.com/gorilla/mux"
-	"server/edidutil"
+	"github.com/damp_donkeys/edidutil"
 )
 
 // Company type information

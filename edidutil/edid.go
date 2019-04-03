@@ -8,7 +8,7 @@ import (
 
 // Returns populated string: string mapping on success, empty string: string mapping on fail
 func ObtainEdidInfo(uid string) map[string] string{
-    out, err := exec.Command("/usr/bin/perl", "edidutil/edid.pl", uid).Output()
+    out, err := exec.Command("/usr/bin/perl", "../edidutil/edid.pl", uid).Output()
     
     if err != nil {
 	log.Printf("Requested edid.pl, got [%s]\n", err)
