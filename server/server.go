@@ -42,8 +42,9 @@ func GetCompanyList(w http.ResponseWriter, r *http.Request){
 }
 
 func GetStudent(w http.ResponseWriter, r *http.Request){
+	enableCors(&w)
 	params := r.URL.Query()
-
+	
 	log.Printf("get_student api called with [%s]\n", params)
 	studentInfo := edidutil.ObtainEdidInfo(params["VT_ID"][0])
 
@@ -63,4 +64,8 @@ func PutStudent(w http.ResponseWriter, r *http.Request){
 	log.Print(params["VT_ID"])
 
 	// exec.Command(/* shell script */, /* 90-number */)
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
