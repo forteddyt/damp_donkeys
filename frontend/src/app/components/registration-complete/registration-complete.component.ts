@@ -6,7 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./registration-complete.component.css']
 })
 export class RegistrationCompleteComponent implements OnInit {
-
+  registered = "You are now registered for your interview!"
+  message = "Thank you for using the CSRS Interviewing check-in system!"
   constructor() { }
 
   ngOnInit() {
