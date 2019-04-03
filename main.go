@@ -47,6 +47,13 @@ func GetStudent(w http.ResponseWriter, r *http.Request){
 	log.Printf("get_student api called with [%s]\n", params)
 	studentInfo := edidutil.ObtainEdidInfo(params["VT_ID"][0])
 
+	// Client request error
+	if(len(studentInfo) == 0){
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+	
 	json.NewEncoder(w).Encode(studentInfo)
 }
 
