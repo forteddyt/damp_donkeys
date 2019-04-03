@@ -14,8 +14,7 @@ type Company struct {
 }
 
 type Student struct{
-	FirstName string `json:"FirstName,omitempty"`
-	LastName string `json:"LastName,omitempty"`
+	DisplayName string `json:"DisplayName,omitempty"`
 	Class string `json:"Class,omitempty"` // Freshman, Sophomore, Junior, Senior
 	Major string `json:"Major,omitempty"`
 }
@@ -24,7 +23,6 @@ var companyList []Company
 
 func main() {
 	log.Print("Starting server...")
-	edidutil.ObtainEdidInfo("906030228")
 
 	router := mux.NewRouter()
 	
@@ -46,9 +44,10 @@ func GetCompanyList(w http.ResponseWriter, r *http.Request){
 func GetStudent(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 
-	log.Print(params["VT_ID"])
+	log.Printf("get_student api called with [%s]\n", params)
+	studentInfo := edidutil.ObtainEdidInfo(params["VT_ID"][0])
 
-	edidutil.ObtainEdidInfo(params["VT_ID"][0])
+	json.NewEncoder(w).Encode(studentInfo)
 }
 
 func PutStudent(w http.ResponseWriter, r *http.Request){
