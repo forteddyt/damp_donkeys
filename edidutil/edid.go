@@ -7,7 +7,7 @@ import (
 )
 
 func ObtainEdidInfo(uid string) {
-    out, err := exec.Command("/usr/bin/perl", "~/go/src/server/edidutil/edid.pl", uid).Output()
+    out, err := exec.Command("/usr/bin/perl", "edidutil/edid.pl", uid).Output()
     if err != nil {
         log.Printf("ERROR: [%s]\n", err)
     } else {
