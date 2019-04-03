@@ -1,7 +1,6 @@
 package edidutil
 
 import (
-    "fmt"
     "log"
     "os/exec" // For running perl script to get info from 90 number
     "strings"
@@ -14,7 +13,7 @@ func ObtainEdidInfo(uid string) map[string] string{
         log.Printf("ERROR: [%s]\n", err)
 	return student
     } else {
-        fmt.Printf("Requested edid.pl, got [%s]\n", out)
+        log.Printf("Requested edid.pl, got [%s]\n", out)
 	s := strings.Split(string(out), ";") //convert []byte to a string and split on ';'
 	
 	student["dispName"] = s[0]
