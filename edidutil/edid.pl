@@ -12,9 +12,9 @@ $cfg{'ED_ID_HOST'}	= 'id.directory.vt.edu';
 $cfg{'ED_ID_PORT'}      = 389;
 $cfg{'ED_ID_VER'}       = 3;
 $cfg{'ED_ID_BASE'}      = 'ou=people,dc=vt,dc=edu';
-$cfg{'ED_ID_CA'} 	= '../edidutil/ed_id_ca.pem';
-$cfg{'ED_ID_CERT'} 	= '../edidutil/public.crt';
-$cfg{'ED_ID_KEY'} 	= '../edidutil/private.key';
+$cfg{'ED_ID_CA'} 	= "$ENV{'GOPATH'}/src/github.com/damp_donkeys/edidutil/ed_id_ca.pem";
+$cfg{'ED_ID_CERT'} 	= "$ENV{'GOPATH'}/src/github.com/damp_donkeys/edidutil/public.crt";
+$cfg{'ED_ID_KEY'} 	= "$ENV{'GOPATH'}/src/github.com/damp_donkeys/edidutil/private.key";
 $cfg{'ED_ID_USER'} 	= 'dn:uusid=cs-career-fair,ou=services,dc=vt,dc=edu';
 
 sub ed_id
