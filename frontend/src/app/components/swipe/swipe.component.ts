@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-swipe',
@@ -9,7 +10,8 @@ export class SwipeComponent implements OnInit {
   title = "Enter PID"
   PIDInput = "Enter your PID"
   pid = ''
-  constructor() { }
+  student_info
+  constructor(private http:HttpClient) { }
 
   ngOnInit() {
     document.getElementById("pid_input").focus();
@@ -28,7 +30,10 @@ export class SwipeComponent implements OnInit {
     }
     event.target.value = this.pid;
     if (this.pid.length == 9 && /^\d+$/.test(this.pid)) {
-      //API Call here and move onto next page
+      var student = this.http.get("http://csrcint.cs.vt.edu:8080/get_student?VT_ID=" + this.pid).subscribe((res) => {
+        console.log(res);
+        this.student_info = res;
+      });
     }
   }
 }
