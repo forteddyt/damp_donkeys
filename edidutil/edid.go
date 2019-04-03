@@ -7,9 +7,10 @@ import (
 )
 
 func ObtainEdidInfo(uid string) {
-    out, err := exec.Command("/bin/sh", "edid_call.sh", uid).Output()
+    out, err := exec.Command("/usr/bin/perl", "~/go/src/server/edidutil/edid.pl", uid).Output()
     if err != nil {
-        log.Fatal(err)
+        log.Printf("ERROR: [%s]\n", err)
+    } else {
+        fmt.Printf("%s\n", out)
     }
-    fmt.Printf("The date is %s\n", out)
 }
