@@ -14,7 +14,7 @@ const routes: Routes = [
   { path: 'review', component: ReviewScreenComponent},
   { path: 'complete', component: RegistrationCompleteComponent},
   { path: 'employers', component: CompanyWelcomeComponent },
-  { path: 'employers/interviews', component: CompanyUniqueComponent },
+  { path: 'employers/:code', component: CompanyUniqueComponent },
   { path: 'admin', component: AdminComponent },
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
