@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-company-unique',
@@ -6,10 +7,15 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./company-unique.component.css']
 })
 export class CompanyUniqueComponent implements OnInit {
+  code: String;
 
-  constructor() { }
+  constructor(private route: ActivatedRoute) {
+     //code = this.route.snapshot.paramMap.get('code');
+  }
 
   ngOnInit() {
+    //this.code = this.route.snapshot.paramMap.get('code');
+    this.code = this.route.snapshot.params.code;
   }
 
 }
