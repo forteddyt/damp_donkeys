@@ -1,3 +1,7 @@
 #interview_table {
-  margin-left: 40%;
+  margin: 0 auto
+}
+
+table, td, th {
+  border: 1px solid #000000;
 }

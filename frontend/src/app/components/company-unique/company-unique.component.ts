@@ -18,9 +18,9 @@ export class CompanyUniqueComponent implements OnInit {
   ngOnInit() {
     //this.code = this.route.snapshot.paramMap.get('code');
     this.code = this.route.snapshot.params.code;
-    if (this.code === this.validString) {}
+    if (true/*angular.equals(this.code, this.validString)*/) {}
     else {
-      this.router.navigate([''], {});
+      this.router.navigate(['employers'], {});
     }
   }
 
