@@ -10,6 +10,8 @@ import { AdminComponent } from './components/admin/admin.component';
 import { AdminWelcomeComponent } from './components/admin-welcome/admin-welcome.component';
 import { CompanyEditorComponent } from './components/company-editor/company-editor.component';
 import { StatisticsComponent } from './components/statistics/statistics.component';
+import { AddCompanyComponent } from './components/add-company/add-company.component';
+import { ViewCompanyComponent } from './components/view-company/view-company.component';
 
 const routes: Routes = [
   { path: '', component: SwipeComponent},
@@ -19,8 +21,10 @@ const routes: Routes = [
   { path: 'employers', component: CompanyWelcomeComponent },
   { path: 'employers/:code', component: CompanyUniqueComponent },
   { path: 'admin', component: AdminComponent },
-  { path: 'admin/nav', component: AdminWelcomeComponent},
-  { path: 'admin/companies', component: CompanyEditorComponent},
+  { path: 'admin/nav', component: AdminWelcomeComponent },
+  { path: 'admin/companies', component: CompanyEditorComponent },
+  { path: 'admin/companies/add', component: AddCompanyComponent },
+  { path: 'admin/companies/view/:name', component: ViewCompanyComponent },
   { path: 'admin/stats', component: StatisticsComponent},
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
