@@ -10,6 +10,9 @@ import { RegistrationCompleteComponent } from './components/registration-complet
 import { CompanyUniqueComponent } from './components/company-unique/company-unique.component';
 import { CompanyWelcomeComponent } from './components/company-welcome/company-welcome.component';
 import { AdminComponent } from './components/admin/admin.component';
+import { AdminWelcomeComponent } from './components/admin-welcome/admin-welcome.component';
+import { CompanyEditorComponent } from './components/company-editor/company-editor.component';
+import { StatisticsComponent } from './components/statistics/statistics.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +23,10 @@ import { AdminComponent } from './components/admin/admin.component';
     RegistrationCompleteComponent,
     CompanyUniqueComponent,
     CompanyWelcomeComponent,
-    AdminComponent
+    AdminComponent,
+    AdminWelcomeComponent,
+    CompanyEditorComponent,
+    StatisticsComponent
   ],
   imports: [
     BrowserModule,
