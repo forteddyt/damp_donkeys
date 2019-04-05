@@ -7,7 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class RegistrationCompleteComponent implements OnInit {
   registered = "You are now registered for your interview!"
-  message = "Thank you for using the CSRS Interviewing check-in system!"
+  message = "Thank you for using the CSRS Interviewing Check-In System!"
   constructor() { }
 
   ngOnInit() {

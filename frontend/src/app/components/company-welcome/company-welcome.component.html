@@ -5,8 +5,10 @@
   <p>
     Please Enter Your Unique Code
   </p>
-  <input id="employer_code">
-  <br />
-  <br />
-  <button id="employer_submit" [routerLink]="['/employers/interviews', 'something']">Submit</button>
+  <form id="code_form">
+    <input id="employer_code" name="input">
+    <br />
+    <br />
+    <button id="employer_submit" routerLink="/employers/{{code_form.input}}">Submit</button>
+  </form>
 </div>
