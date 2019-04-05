@@ -24,7 +24,6 @@ const routes: Routes = [
   { path: 'admin/nav', component: AdminWelcomeComponent },
   { path: 'admin/companies', component: CompanyEditorComponent },
   { path: 'admin/companies/add', component: AddCompanyComponent },
-  { path: 'admin/companies/add/:name', component: AddCompanyComponent },
   { path: 'admin/companies/view/:name', component: ViewCompanyComponent },
   { path: 'admin/stats', component: StatisticsComponent},
   { path: '**', redirectTo: '', pathMatch: 'full' }
