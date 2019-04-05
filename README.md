@@ -4,7 +4,8 @@
 ## Setup Instructions
 Install Golang version 1.12.
 
-This server uses `mux` to route requests, install the package by executing `go get github.com/gorilla/mux`
+This server uses `gorilla/mux` and `rs/cors` to route requests. Obtain package by running `go get github.com/<package>`
+
 
 
 Directory structure should mirror the following:
