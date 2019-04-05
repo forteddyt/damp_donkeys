@@ -6,7 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./review-screen.component.css']
 })
 export class ReviewScreenComponent implements OnInit {
-
+  name = ""
+  title = "Review"
   constructor() { }
 
   ngOnInit() {

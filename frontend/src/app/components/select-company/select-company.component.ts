@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Router, ActivatedRoute, NavigationStart } from '@angular/router';
 
 @Component({
   selector: 'app-select-company',
@@ -6,10 +8,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./select-company.component.css']
 })
 export class SelectCompanyComponent implements OnInit {
+  student: Observable<object>;
 
-  constructor() { }
-
-  ngOnInit() {
+  constructor(public route: ActivatedRoute) {
+    this.route.queryParams.subscribe(params => {
+      console.log(params);
+    });
   }
 
+  ngOnInit() { 
+  }
 }
