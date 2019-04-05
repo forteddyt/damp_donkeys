@@ -15,6 +15,7 @@ import { CompanyEditorComponent } from './components/company-editor/company-edit
 import { StatisticsComponent } from './components/statistics/statistics.component';
 import { AddCompanyComponent } from './components/add-company/add-company.component';
 import { ViewCompanyComponent } from './components/view-company/view-company.component';
+import bootstrap from "bootstrap";
 
 @NgModule({
   declarations: [

@@ -29,4 +29,5 @@ export class CompanyWelcomeComponent implements OnInit {
     //}
   }
 
+
 }
