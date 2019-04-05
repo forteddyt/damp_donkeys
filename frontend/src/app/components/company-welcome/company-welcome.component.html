@@ -5,10 +5,10 @@
   <p>
     Please Enter Your Unique Code
   </p>
-  <form id="code_form">
-    <input id="employer_code" name="input">
+  <form id="code_form" name="code_form">
+    <input type="text" id="employer_code" name="input">
     <br />
     <br />
-    <button id="employer_submit" routerLink="/employers/{{code_form.input}}">Submit</button>
+    <button id="employer_submit" [routerLink]="['/employers', code_form.input]">Submit</button>
   </form>
 </div>

@@ -26,7 +26,7 @@ export class SwipeComponent implements OnInit {
       var start = input.indexOf('9');
       if (start != -1) {
         this.pid = input.substring(start, start + 9);
-      } 
+      }
     }
     event.target.value = this.pid;
     if (this.pid.length == 9 && /^\d+$/.test(this.pid)) {

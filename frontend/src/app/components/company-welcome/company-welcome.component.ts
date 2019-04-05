@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -15,10 +17,16 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./company-welcome.component.css']
 })
 export class CompanyWelcomeComponent implements OnInit {
+  code: String
 
-  constructor() { }
+  constructor(private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit() {
+    //this.code = this.route.snapshot.params.input;
+    //if (this.code === "")
+    //{
+    //  this.router.navigate(['employers/something'], {});
+    //}
   }
 
 }
