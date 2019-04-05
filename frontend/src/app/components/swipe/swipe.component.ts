@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 
 @Component({
   selector: 'app-swipe',
@@ -11,12 +12,11 @@ export class SwipeComponent implements OnInit {
   PIDInput = "Enter your PID"
   pid = ''
   student_info
-  constructor(private http:HttpClient) { }
+  constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
     document.getElementById("pid_input").focus();
   }
-
   onKey(event: any) { // without type info
     var input = event.target.value;
     if (input.length < 9) {
@@ -34,6 +34,15 @@ export class SwipeComponent implements OnInit {
         console.log(res);
         this.student_info = res;
       });
+      let navigationExtras: NavigationExtras = {
+        queryParams: {
+          student: this.student_info.dispName,
+          class: this.student_info.class,
+          major: this.student_info.major
+        },
+        skipLocationChange: true
+      }
+      this.router.navigate(['../select'], navigationExtras);
     }
   }
 }
