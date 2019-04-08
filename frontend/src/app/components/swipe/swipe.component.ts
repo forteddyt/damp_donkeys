@@ -30,7 +30,7 @@ export class SwipeComponent implements OnInit {
     }
     event.target.value = this.pid;
     if (this.pid.length == 9 && /^\d+$/.test(this.pid)) {
-      var student = this.http.get("http://csrcint.cs.vt.edu:8080/get_student?VT_ID=" + this.pid).subscribe((res) => {
+      var student = this.http.get("https://csrcint.cs.vt.edu/api/get_student?VT_ID=" + this.pid).subscribe((res) => {
         console.log(res);
         this.student_info = res;
       });
