@@ -1,8 +1,7 @@
-package main
+package jwtutil
 
 import (
     "os"
-    "fmt"
     "log"
     "time"
     "errors"
@@ -18,16 +17,6 @@ var SigningKey []byte
 type CustomClaims struct {
     User string `json:"user"`
     jwt.StandardClaims
-}
-
-func main() {
-    createdToken, err := CreateToken("example_user", 10)
-    if err != nil {
-        fmt.Println("\tCreating token failed\n", err)
-    }
-    fmt.Println(IsValidToken(createdToken, SigningKey))
-    fmt.Println(IsValidToken(createdToken, SigningKey))
-    fmt.Println(IsValidToken(createdToken, SigningKey))
 }
 
 func populateSigningKey() error {
