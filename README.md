@@ -4,7 +4,7 @@
 ## Setup Instructions
 Install Golang version 1.12.
 
-This server uses `gorilla/mux` and `rs/cors` to route requests. Obtain package by running `go get github.com/<package>`
+This server uses `gorilla/mux`, `rs/cors`, and `dgrijalva/jwt-go`. Obtain package by running `go get github.com/<package>`
 
 
 
