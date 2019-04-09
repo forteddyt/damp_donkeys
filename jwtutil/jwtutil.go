@@ -68,8 +68,8 @@ func CreateToken(user string, minutes int) (string, error) {
     return ss, err
 }
 
-func IsValidToken(givenToken string, myKey []byte) bool{
-    token, err := jwt.Parse(givenToken,func(token *jwt.Token) (interface{}, error) {
+func IsValidToken(givenToken string) bool{
+    token, err := jwt.Parse(givenToken, func(token *jwt.Token) (interface{}, error) {
         return SigningKey, nil
     })
 
