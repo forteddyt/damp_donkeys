@@ -83,10 +83,16 @@ func GetStudent(w http.ResponseWriter, r *http.Request){
 	
 	log.Printf("Origin Header: %s", r.Header.Get("Origin"))
 	log.Printf("get_student api called with [%s]\n", params)
+	if len(params["VT_ID"]) == 0 || params["VT_ID"][0] == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{})
+		return
+	}
+
 	studentInfo := edidutil.ObtainEdidInfo(params["VT_ID"][0]) // {} on failure
 
 	// Client request error
-	if(len(studentInfo) == 0){
+	if len(studentInfo) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -99,13 +105,12 @@ func Login(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 	log.Printf("login api called with [%s]\n", params)
 
-	givenPwdHash := params["password_hash"][0]
-
 	// Client request error
-	if(givenPwdHash == ""){
+	if len(params["password_hash"]) == 0 || params["password_hash"][0] == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{})
 	} else {
+		givenPwdHash := params["password_hash"][0]
 		dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
 		if err != nil {
 			log.Printf("Database connection failed: %s\n", err)
