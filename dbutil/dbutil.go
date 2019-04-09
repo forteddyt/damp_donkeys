@@ -29,7 +29,7 @@ type Student struct {
 func OpenDB(databasename string, username string, password string) (*sql.DB, error) {
 	//Reminder to Change Dev to CSRCINTERVIEW
 	db, err := sql.Open("mysql",
-		username + ":" + password + "!@tcp(127.0.0.1:3306)/" + databasename)
+		username + ":" + password + "@tcp(127.0.0.1:3306)/" + databasename)
 	if err != nil {
 		return nil, err
 	}
