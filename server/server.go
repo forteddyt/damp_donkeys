@@ -25,7 +25,7 @@ func main() {
 	log.Print("Starting server...")
 
 	err := credentialSetup()
-	if err != nil { log.Fatal("Credential setup failed!") }
+	if err != nil { log.Fatal("Credential setup failed: %s", err) }
 
 	router := mux.NewRouter()
 	
