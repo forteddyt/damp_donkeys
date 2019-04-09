@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 	"github.com/gorilla/mux"
-	"github.com/damp_donkeys/edidutil"
 	"github.com/rs/cors"
+	"github.com/damp_donkeys/edidutil"
+	"github.com/damp_donkeys/jwtutil"
+	"github.com/damp_donkeys/dbutil"
 )
 
 // Company type information
@@ -29,17 +31,17 @@ func main() {
 	
 	router.HandleFunc("/company_list", GetCompanyList).Methods("GET")
 	router.HandleFunc("/get_student", GetStudent).Methods("GET")
-	router.HandleFunc("/put_student", PutStudent).Methods("POST")
+	router.HandleFunc("/login", Login).Methods("GET")
 
 	c := cors.New(cors.Options{
-	    AllowedOrigins: []string{"http://csrcint.cs.vt.edu", "*"},
+	    AllowedOrigins: []string{"https://csrcint.cs.vt.edu"},
 	    AllowCredentials: true,
 	    // Enable Debugging for testing, consider disabling in production
 	    Debug: true,
 	})
 	
 	handler := cors.Default().Handler(router)
-	handler = c.Handler(handler)
+	// handler = c.Handler(handler)
 	http.ListenAndServe(":8080", handler)
 }
 
@@ -68,9 +70,35 @@ func GetStudent(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(studentInfo)
 }
 
-func PutStudent(w http.ResponseWriter, r *http.Request){
-	params := r.URL.Query()
+func Login(w http.ResponseWriter, r *http.Request){
+	log.Printf("login api called with [%s]\n", params)
 
-	log.Print(params["VT_ID"])
+	params := r.URL.Query()
+	givenPwdHash := params["password_hash"]
+
+	// Client request error
+	if(givenPwdHash == nil){
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode()
+	} else {
+		dbconn, err := dbutil.OpenDB("")
+		user, err = "", nil // dbutil.getUser(givenPwdHash)
+
+		// Database request error
+		if err != nil {
+			log.Printf("Could not get password hash from database\n")
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode()
+			return
+		}
+
+		// No user with that password hash was found
+		if user == "" {
+			log.Printf("No user with password hash '%s' found\n", givenPwdHash)
+			w.WriteHeader(http.StatusUnauthorized)
+			json.NewEncoder(w).Encode()
+		}
+
+	}
 }
 
