@@ -145,7 +145,7 @@ func Login(w http.ResponseWriter, r *http.Request){
 			return
 		}
 
-		m := map[string]string{"jwt": jwt, "user": user}
+		m := map[string]string{"jwt": jwt}
 		log.Printf("JWT Token created successfully, valid for %s minutes\n", JWT_DURATION)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(m)
