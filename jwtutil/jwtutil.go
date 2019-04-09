@@ -12,7 +12,7 @@ import (
 )
 
 // initially empty string populated on first token creation
-var SigningKey []byte
+var SigningKey string
 
 type CustomClaims struct {
     User string `json:"user"`
@@ -20,7 +20,7 @@ type CustomClaims struct {
 }
 
 func populateSigningKey() error {
-    if SigningKey == nil {
+    if SigningKey == "" {
         log.Println("Setting JWT signing key...")
         gopath := os.Getenv("GOPATH")
 
@@ -35,7 +35,7 @@ func populateSigningKey() error {
 
         byteValue , _ := ioutil.ReadAll(jsonFile) // Read json as []byte
 
-        var result map[string][]byte // result will be a mapping of string to []byte
+        var result map[string]string // result will be a mapping of string to []byte
 
         json.Unmarshal(byteValue, &result)
 
@@ -64,7 +64,7 @@ func CreateToken(user string, minutes int) (string, error) {
     }
 
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    ss, err := token.SignedString(SigningKey)
+    ss, err := token.SignedString([]byte(SigningKey))
     return ss, err
 }
 
