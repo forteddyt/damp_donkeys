@@ -10,15 +10,15 @@ import { SelectCompanyTileComponent } from "../select-company-tile/select-compan
 })
 export class SelectCompanyComponent implements AfterViewInit {
   @ViewChild('companyInsert', { read: ViewContainerRef }) companyInsert: ViewContainerRef;
-  state_vars
-  company_list
+  stateData
+  companyList
   header
   sticky
 
   constructor(private http: HttpClient, private router: Router, private vcr: ViewContainerRef, private cfr: ComponentFactoryResolver) {
-    this.state_vars = this.router.getCurrentNavigation().extras.state;
-    if(this.state_vars == null || this.state_vars.pid == null){
-      console.log("null state; should redirect to '/'")
+    this.stateData = this.router.getCurrentNavigation().extras.state;
+    if(this.stateData == null || this.stateData.pid == null){
+      console.log("Invalid state has been passed (or not passed at all); should redirect to '/'")
     }
   }
 
@@ -26,7 +26,7 @@ export class SelectCompanyComponent implements AfterViewInit {
     const resp = await this.getCompanies();
     
     console.log(resp.status)
-    this.company_list = resp.body
+    this.companyList = resp.body
     this.loadComponents()
   }
 
@@ -35,12 +35,14 @@ export class SelectCompanyComponent implements AfterViewInit {
   }
 
   loadComponents() {
-    console.log(this.company_list)
+    console.log(this.companyList)
     const cFactory = this.cfr.resolveComponentFactory(SelectCompanyTileComponent);
     this.companyInsert.clear();
-    for(var i in this.company_list){
+    for(var i in this.companyList){
       const companyComponent = <SelectCompanyTileComponent>this.companyInsert.createComponent(cFactory).instance;
-      companyComponent.companyName = this.company_list[i];
+      
+      companyComponent.companyName = this.companyList[i];
+      companyComponent.stateData = this.stateData;
     }
   }
 }
