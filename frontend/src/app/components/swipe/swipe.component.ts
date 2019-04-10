@@ -8,8 +8,8 @@ import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
   styleUrls: ['./swipe.component.css']
 })
 export class SwipeComponent implements OnInit {
-  title = "Enter PID"
-  PIDInput = "Enter your PID"
+  title = "Swipe your card or Enter your 90-number"
+  PIDInput = "Enter your 90-number"
   pid = ''
   student_info
   constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) { }
