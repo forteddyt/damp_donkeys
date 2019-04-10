@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }   from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 
 @NgModule({
   imports: [
@@ -21,17 +21,22 @@ import { FormsModule }   from '@angular/forms';
   styleUrls: ['./company-welcome.component.css']
 })
 export class CompanyWelcomeComponent implements OnInit {
-  code: String
+  code = ''
 
-  constructor(private route: ActivatedRoute, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
-    //this.code = this.route.snapshot.params.input;
-    //if (this.code === "")
-    //{
-    //  this.router.navigate(['employers/something'], {});
-    //}
+    document.getElementById("employer_code").focus();
   }
 
+  onKey(event: any)
+  {
+    this.code = event.target.value;
+  }
 
+  handleClick(event: any)
+  {
+    //this.code = "Clicked"
+    this.router.navigateByUrl('/employers/' + this.code);
+  }
 }
