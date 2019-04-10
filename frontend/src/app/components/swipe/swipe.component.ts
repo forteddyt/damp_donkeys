@@ -11,7 +11,7 @@ export class SwipeComponent implements OnInit {
   title = "Swipe your card or Enter your 90-number"
   PIDInput = "Enter your 90-number"
   pid = ''
-  student_info
+  student_info = {}
   constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) { }
 
   ngOnInit() {
