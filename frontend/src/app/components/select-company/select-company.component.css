@@ -1,8 +1,25 @@
-.company_button {
-  padding: 30px;
-  margin: 30px;
+body {
+	margin: 40px;
+	text-align: center;
 }
 
-#select_div {
-  text-align: center
+.simpleCenter {
+	text-align: center;
+}
+
+.header {
+	background: #D3D3D3;
+	padding: 10px;
+}
+
+/* The sticky class is added to the header with JS when it reaches its scroll position */
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%
+}
+
+/* Page content */
+.content {
+  padding: 70px;
 }

@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SwipeComponent } from './components/swipe/swipe.component';
+import { SelectCompanyTileComponent } from './components/select-company-tile/select-company-tile.component';
 import { SelectCompanyComponent } from './components/select-company/select-company.component';
 import { ReviewScreenComponent } from './components/review-screen/review-screen.component';
 import { RegistrationCompleteComponent } from './components/registration-complete/registration-complete.component';
@@ -31,7 +32,11 @@ import bootstrap from "bootstrap";
     CompanyEditorComponent,
     StatisticsComponent,
     AddCompanyComponent,
-    ViewCompanyComponent
+    ViewCompanyComponent,
+    SelectCompanyTileComponent
+  ],
+  entryComponents: [
+    SelectCompanyTileComponent
   ],
   imports: [
     BrowserModule,
