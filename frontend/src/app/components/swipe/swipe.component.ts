@@ -34,15 +34,12 @@ export class SwipeComponent implements OnInit {
         console.log(res);
         this.student_info = res;
       });
-      let navigationExtras: NavigationExtras = {
-        queryParams: {
-          student: this.student_info.dispName,
-          class: this.student_info.class,
-          major: this.student_info.major
-        },
-        skipLocationChange: true
+      let stateData = {
+        student: this.student_info.dispName,
+        class: this.student_info.class,
+        major: this.student_info.major
       }
-      this.router.navigate(['../select'], navigationExtras);
+      this.router.navigate(['/select'], { state: stateData });
     }
   }
 }

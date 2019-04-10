@@ -10,10 +10,8 @@ import { Router, ActivatedRoute, NavigationStart } from '@angular/router';
 export class SelectCompanyComponent implements OnInit {
   student: Observable<object>;
 
-  constructor(public route: ActivatedRoute) {
-    this.route.queryParams.subscribe(params => {
-      console.log(params);
-    });
+  constructor(private router: Router) {
+    console.log(this.router.getCurrentNavigation().extras.state);
   }
 
   ngOnInit() { 
