@@ -5,10 +5,8 @@
   <p>
     Please Enter Your Unique Code
   </p>
-  <!--<form>-->
-  <!--  <input type="text" id="employer_code" name="name">-->
-  <!--  <br />-->
-  <!--  <br />-->
-  <!--</form>-->
-  <!--<button id="employer_submit" [routerLink]="['/employers', 'stuff']">Submit</button>-->
+  <input type="text" id="employer_code" name="name" (keyup)="onKey($event)">
+  <br />
+  <br />
+  <button id="employer_submit" (click)="handleClick($event)">Submit</button>
 </div>
