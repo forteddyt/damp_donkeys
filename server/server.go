@@ -75,7 +75,12 @@ func credentialSetup() error{
 
 func GetCompanyList(w http.ResponseWriter, r *http.Request){
 	log.Print("Serving companyList")
-	json.NewEncoder(w).Encode(map[string]string{})
+	
+	// Temporary until db function is written
+	temp := [3]string{"Company 1", "Company 2", "Long named company example"}
+	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(temp)
 }
 
 func GetStudent(w http.ResponseWriter, r *http.Request){
