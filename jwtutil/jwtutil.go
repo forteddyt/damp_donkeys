@@ -68,9 +68,17 @@ func CreateToken(user string, minutes int) (string, error) {
     return ss, err
 }
 
-func ParseClaims(tokenString string) (jwt.MapClaims, error) {
-    claims := jwt.MapClaims{}
-    _, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+func RefreshToken(tokenString string, minutes int) (string, error) {
+    claims, err := ParseClaims(tokenString)
+    if err != nil {
+        return "", err
+    }
+
+    return CreateToken(claims.User, minutes)
+}
+
+func ParseClaims(tokenString string) (*CustomClaims, error) {
+    token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
         return []byte(signingKey), nil
     })
 
@@ -78,7 +86,12 @@ func ParseClaims(tokenString string) (jwt.MapClaims, error) {
         return nil, err
     }
 
-    return claims, nil
+    if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+        return claims, nil
+    } else {
+        return nil, err
+    }
+
 }
 
 func IsValidToken(givenToken string) (bool, error){
