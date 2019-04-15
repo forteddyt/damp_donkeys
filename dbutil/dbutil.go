@@ -26,6 +26,11 @@ type Student struct {
 	idnumber string
 }
 
+type Interview struct {
+	student Student
+	time string
+}
+
 func OpenDB(databasename string, username string, password string) (*sql.DB, error) {
 	//Reminder to Change Dev to CSRCINTERVIEW
 	db, err := sql.Open("mysql",
@@ -60,6 +65,7 @@ func AddEmployer(db *sql.DB, name string, password string) (bool, error) {
 		return false, err
 	}
 	if isValidEmployer {
+		//Find and Add Employer to CareerFairsEmployers
 		return false, nil
 	}
 	stmt, err := db.Prepare("INSERT INTO Employers(name, password) VALUES(?, ?);")
@@ -68,6 +74,7 @@ func AddEmployer(db *sql.DB, name string, password string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	//Add Employer to CareerFairsEmployers Table
 	return true, nil
 }
 
@@ -93,8 +100,8 @@ func AddStudent(db *sql.DB, displayname string, major string, class string, idnu
 	if isValidStudent {
 		return false, nil;
 	}	
-        stmt, err := db.Prepare("INSERT INTO Students(displayname, major, class, idnumber) VALUES(?, ?, ?, ?);")
-        res, err := stmt.Exec(displayname, major, class, idnumber)
+        stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(?);")
+        res, err := stmt.Exec(idnumber)
 	_ = res
         if err != nil {
                 return false, err;
@@ -114,14 +121,15 @@ func AddInterview(db *sql.DB, idnumber string, employername string) (bool, error
         }
         return true, nil
 }
-
-func ShowStudents(db *sql.DB, employername string) ([]Student, error) {
+//Test Methods Below
+func ShowStudents(db *sql.DB, employername string) ([]Interview, error) {
 	var (
 		displayname string
 		major string
 		class string
+		date string
 	)
-	stmt, err := db.Prepare("SELECT displayname, major, class FROM Students WHERE ID IN (SELECT StudentID FROM Interviews WHERE EmployerID = (SELECT ID FROM Employers WHERE name = ?));")
+	stmt, err := db.Prepare("SELECT displayname, major, class, DATE_FORMAT(CheckInTime, \"%h:%i\") FROM Interviews INNER JOIN StudentsCareerFairs USING (StudentID) WHERE EmployerID = (SELECT ID FROM Employers WHERE name = ?);")
 	if err != nil {
 		return nil, err
 	}
@@ -131,20 +139,20 @@ func ShowStudents(db *sql.DB, employername string) ([]Student, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	students := make([]Student, 0, 10)
+	students := make([]Interview, 0, 10)
 	for rows.Next() {
-		err := rows.Scan(&displayname, &major, &class)
+		err := rows.Scan(&displayname, &major, &class, &date)
 		if err != nil {
 			return nil, err
 		}
-		students = append(students, Student{displayname, major, class, ""})
+		students = append(students, Interview{Student{displayname, major, class, ""}, date})
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 	return students, nil
 }
-
+//Need to Test Methods Below
 func CheckPasswordHash(db *sql.DB, passhash string) (string, error) {
 	var name string
 	stmt, err := db.Prepare("SELECT name FROM Employers WHERE password = ?")
@@ -170,4 +178,92 @@ func CheckPasswordHash(db *sql.DB, passhash string) (string, error) {
 	}
 	return name, nil;
 }
+
+func ShowEmployers(db *sql.DB, employername string) ([]string, error) {
+        var (
+                name string
+        )
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT EmployerID FROM CareerFairsEmployers WHERE CareerFairID = (SELECT MAX(ID) FROM CareerFair));")
+        if err != nil {
+                return nil, err
+        }
+        defer stmt.Close()
+        rows, err := stmt.Query(employername)
+        if err != nil {
+                return nil, err
+        }
+        defer rows.Close()
+        employers := make([]string, 0, 10)
+        for rows.Next() {
+                err := rows.Scan(&name)
+                if err != nil {
+                        return nil, err
+                }
+                employers = append(employers, name)
+        }
+        if err = rows.Err(); err != nil {
+                return nil, err
+        }
+        return employers, nil
+}
+
+func ShowCareerFairsByName(db *sql.DB) ([]string, error) {
+        var (
+                name string
+        )
+        stmt, err := db.Prepare("SELECT name FROM CareerFairs ORDER BY startdate DESC;")
+        if err != nil {
+                return nil, err
+        }
+        defer stmt.Close()
+        rows, err := stmt.Query()
+        if err != nil {
+                return nil, err
+        }
+        defer rows.Close()
+        careerfairs := make([]string, 0, 10)
+        for rows.Next() {
+                err := rows.Scan(&name)
+                if err != nil {
+                        return nil, err
+                }
+                careerfairs = append(careerfairs, name)
+        }
+        if err = rows.Err(); err != nil {
+                return nil, err
+        }
+        return careerfairs, nil
+}
+
+func UpdatePassword(db *sql.DB, name string, password string) (bool, error) {
+        stmt, err := db.Prepare("UPDATE Employers SET password = ? WHERE name = ?")
+        res, err := stmt.Exec(password, name)
+        _ = res
+        if err != nil {
+                return false, err
+        }
+        //Add Employer to CareerFairsEmployers Table
+        return true, nil
+}
+
+func addStudentToCurrentCareerFair(db *sql.DB, displayname string, major string, class string, idnumber string) (bool, error) {
+        stmt, err := db.Prepare("INSERT INTO StudentsCareerFairs(StudentID, CareerFairID, displayname, major, class) VALUES((SELECT ID FROM Students WHERE idnumber = ?), (SELECT Max(ID) FROM CareerFair), ?, ?, ?);")
+        res, err := stmt.Exec(idnumber, displayname, major, class)
+        _ = res
+        if err != nil {
+                return false, err;
+        }
+        return true, nil;
+}
+
+func addEmployersToCurrentCareerFair(db *sql.DB, name string) (bool, error) {
+        stmt, err := db.Prepare("INSERT INTO EmployersCareerFairs(EmployerID, CareerFairID) SELECT e.ID, c.ID FROM Employers e, CareerFairs c WHERE c.ID = MAX(ID) AND e.name = ?;")
+        res, err := stmt.Exec(name)
+        _ = res
+        if err != nil {
+                return false, err;
+        }
+        return true, nil;
+}
+
 
