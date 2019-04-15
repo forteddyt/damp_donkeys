@@ -22,9 +22,9 @@ const(
 var DBPassword, DBUsername string
 
 type CheckInResp struct {
-	CompanyName string `json:company_name`
-	Students []dbutil.Student `json:students`
-	JWT string `json:jwt`
+	CompanyName string `json:"company_name"`
+	Students []dbutil.Interview `json:"students"`
+	JWT string `json:"jwt"`
 }
 
 func main() {
@@ -158,10 +158,8 @@ func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
 		Students: students,
 		JWT: new_jwt,
 	}
-	respM, _ := json.Marshal(resp)
-
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(respM)
+	json.NewEncoder(w).Encode(resp)
 }
 
 func GetCompanyList(w http.ResponseWriter, r *http.Request){
