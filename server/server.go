@@ -21,6 +21,12 @@ const(
 // Credentials obtained from .gitignored files on server startup
 var DBPassword, DBUsername string
 
+type CheckInResp struct {
+	CompanyName string `json:company_name`
+	Students []dbutil.Student `json:students`
+	JWT string `json:jwt`
+}
+
 func main() {
 	log.Print("Starting server...")
 
@@ -31,6 +37,7 @@ func main() {
 	
 	router.HandleFunc("/company_list", GetCompanyList).Methods("GET")
 	router.HandleFunc("/get_student", GetStudent).Methods("GET")
+	router.HandleFunc("/company_check_ins", CompanyCheckIns).Methods("GET")
 	router.HandleFunc("/login", Login).Methods("GET")
 
 	c := cors.New(cors.Options{
@@ -73,6 +80,90 @@ func credentialSetup() error{
 	return nil
 }
 
+func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
+	params := r.URL.Query()
+	
+	log.Printf("company_check_ins api called with [%s]\n", params)
+	if len(params["jwt"]) == 0 || params["jwt"][0] == "" ||
+		len(params["company_name"]) == 0 || params["company_name"][0] == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{})
+		return
+	}
+
+	old_jwt := params["jwt"][0]
+	company_name := params["company_name"][0]
+
+	// ERROR HANDLING
+
+	// If jwt has expired, deny access
+	is_valid, err := jwtutil.IsValidToken(old_jwt)
+	if !is_valid {
+		log.Printf("JWT Token invalid: %s\n", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{})
+		return
+	}
+
+	claims, err := jwtutil.ParseClaims(old_jwt)
+
+	// Something went wrong internally
+	if err != nil {
+		log.Printf("ParseClaims error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{})
+		return
+	}
+
+	jwt_user := claims.User
+	// If JWT and requested company are invalid
+	if jwt_user != company_name {
+		log.Printf("JWT invalid for requested company [%s != %s]\n", jwt_user, company_name)
+		w.WriteHeader(http.StatusUnauthorized)
+		json.NewEncoder(w).Encode(map[string]string{})
+		return
+	}
+
+	new_jwt, err := jwtutil.RefreshToken(old_jwt, JWT_DURATION)
+
+	if err != nil {
+		log.Printf("RefreshToken error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{})
+		return
+	}
+
+	// END ERROR HANDLING
+
+	dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
+	if err != nil {
+		log.Printf("Database connection failed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{})
+		return
+	}
+	defer dbutil.CloseDB(dbconn)
+	students, err := dbutil.ShowStudents(dbconn, company_name)
+
+	// Database request error
+	if err != nil {
+		log.Printf("Could not get checked in students from database: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{})
+		return
+	}
+
+	resp := &CheckInResp{
+		CompanyName: company_name,
+		Students: students,
+		JWT: new_jwt,
+	}
+	respM, _ := json.Marshal(resp)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(respM)
+}
+
 func GetCompanyList(w http.ResponseWriter, r *http.Request){
 	log.Print("Serving companyList")
 	
@@ -86,7 +177,7 @@ func GetCompanyList(w http.ResponseWriter, r *http.Request){
 func GetStudent(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 	
-	log.Printf("Origin Header: %s", r.Header.Get("Origin"))
+	log.Printf("Origin Header: %s\n", r.Header.Get("Origin"))
 	log.Printf("get_student api called with [%s]\n", params)
 	if len(params["VT_ID"]) == 0 || params["VT_ID"][0] == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -151,7 +242,7 @@ func Login(w http.ResponseWriter, r *http.Request){
 		}
 
 		m := map[string]string{"jwt": jwt}
-		log.Printf("JWT Token created successfully, valid for %s minutes\n", JWT_DURATION)
+		log.Printf("JWT Token created successfully, valid for %d minutes\n", JWT_DURATION)
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(m)
 	}
