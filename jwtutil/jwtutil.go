@@ -12,7 +12,7 @@ import (
 )
 
 // initially empty string populated on first token creation
-var SigningKey string
+var signingKey string
 
 type CustomClaims struct {
     User string `json:"user"`
@@ -20,7 +20,7 @@ type CustomClaims struct {
 }
 
 func populateSigningKey() error {
-    if SigningKey == "" {
+    if signingKey == "" {
         log.Println("Setting JWT signing key...")
         gopath := os.Getenv("GOPATH")
 
@@ -39,7 +39,7 @@ func populateSigningKey() error {
 
         json.Unmarshal(byteValue, &result)
 
-        SigningKey = result["signingKey"]
+        signingKey = result["signingKey"]
         log.Println("JWT signing Key set!")
     } else {
         log.Println("JWT singing key already set, doing nothing.")
@@ -64,15 +64,41 @@ func CreateToken(user string, minutes int) (string, error) {
     }
 
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-    ss, err := token.SignedString([]byte(SigningKey))
+    ss, err := token.SignedString([]byte(signingKey))
     return ss, err
 }
 
-func IsValidToken(givenToken string) bool{
-    token, err := jwt.Parse(givenToken, func(token *jwt.Token) (interface{}, error) {
-        return SigningKey, nil
+func RefreshToken(tokenString string, minutes int) (string, error) {
+    claims, err := ParseClaims(tokenString)
+    if err != nil {
+        return "", err
+    }
+
+    return CreateToken(claims.User, minutes)
+}
+
+func ParseClaims(tokenString string) (*CustomClaims, error) {
+    token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+        return []byte(signingKey), nil
     })
 
-    return err == nil && token.Valid 
+    if err != nil {
+        return nil, err
+    }
+
+    if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
+        return claims, nil
+    } else {
+        return nil, err
+    }
+
+}
+
+func IsValidToken(givenToken string) (bool, error){
+    token, err := jwt.Parse(givenToken, func(token *jwt.Token) (interface{}, error) {
+        return []byte(signingKey), nil
+    })
+
+    return err == nil && token.Valid, err
 }
 
