@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Router, ActivatedRoute, NavigationStart } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 
 @Component({
   selector: 'app-select-company',
@@ -9,10 +10,14 @@ import { Router, ActivatedRoute, NavigationStart } from '@angular/router';
 })
 export class SelectCompanyComponent implements OnInit {
   student: Observable<object>;
-
-  constructor(public route: ActivatedRoute) {
-    this.route.queryParams.subscribe(params => {
-      console.log(params);
+  companies: Object;
+  constructor(public route: Router, private http: HttpClient) {
+    var state = this.route.getCurrentNavigation().extras.state;
+    console.log(state);
+    this.http.get("https://csrcint.cs.vt.edu/api/company_list").subscribe((res) => {
+      console.log(res);
+      this.companies = res;
+      console.log(this.companies)
     });
   }
 

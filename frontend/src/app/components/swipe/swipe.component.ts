@@ -35,7 +35,7 @@ export class SwipeComponent implements OnInit {
         this.student_info = res;
       });
       let navigationExtras: NavigationExtras = {
-        queryParams: {
+        state: {
           student: this.student_info.dispName,
           class: this.student_info.class,
           major: this.student_info.major
