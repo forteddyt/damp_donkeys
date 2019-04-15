@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit, ComponentFactoryResolver, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import * as jwt_decode from 'jwt-decode';
+import { InterviewComponent } from "../interview/interview.component"
 
 @Component({
   selector: 'app-company-unique',
@@ -10,25 +11,33 @@ import * as jwt_decode from 'jwt-decode';
   styleUrls: ['./company-unique.component.css']
 })
 export class CompanyUniqueComponent implements OnInit {
+  @ViewChild('interview', { read: ViewContainerRef }) companyInsert: ViewContainerRef;
   code = "";
   validString: String = "abcdefghij";
   company_name = "Company_Name";
   json
   //json_middle
+  api_call_return = {"company_name": "test_company", "interviewees": [{"name": "Joe Smith", "check-in": "11:30"}, {"name": "Jill Smith", "check-in": "12:00"}]};
+  //name_array = ["Joe Smith", "Jill Smith"];
+  //time_arry = ["11:30", "12:00"];
+  companyList
 
-  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router) {
+  constructor(private http: HttpClient, private route: ActivatedRoute, private router: Router, private cfr: ComponentFactoryResolver) {
      //code = this.route.snapshot.paramMap.get('code');
   }
 
   ngOnInit() {
     this.code = this.route.snapshot.params.code;
     var student = this.http.get("https://csrcint.cs.vt.edu/api/login?password_hash=test").subscribe((res) => {
-      console.log(res);
+      //console.log(res);
       this.json = res["jwt"];
       //this.json_middle = this.json.split('.')[1];
       var decoded = jwt_decode(this.json);
+      //console.log(decoded);
       this.company_name = decoded['user'];
     });
+
+    //console.log(this.api_call_return['interviewees'][0]['name']);
     //console.log(this.json_middle);
     //console.log(jwt_decode(this.json));
 
@@ -42,4 +51,30 @@ export class CompanyUniqueComponent implements OnInit {
     //}
   }
 
+  async ngAfterViewInit() {
+    const resp = /*await*/ this.getNames();
+
+    //console.log(resp.status)
+    this.companyList = resp['interviewees'];//.body
+    //console.log(this.companyList);
+    this.loadComponents();
+  }
+
+  getNames()
+  {
+    return this.api_call_return;
+  }
+
+  loadComponents() {
+    console.log(this.companyList);
+    const cFactory = this.cfr.resolveComponentFactory(InterviewComponent);
+    //this.companyInsert.clear();
+    for(var i in this.companyList){
+      console.log("for loop executed");
+      const companyComponent = <InterviewComponent>this.companyInsert.createComponent(cFactory).instance;
+
+      companyComponent.name = this.companyList[i]['name'];
+      companyComponent.time = this.companyList[i]['check-in'];
+    }
+  }
 }
