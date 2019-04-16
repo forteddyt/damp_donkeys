@@ -6,7 +6,9 @@ import (
 	"log"
 	"errors"
 	"net/http"
+	"crypto/sha1"
 	"encoding/json"
+	"encoding/base64"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/damp_donkeys/edidutil"
@@ -81,13 +83,20 @@ func credentialSetup() error{
 	return nil
 }
 
+func hashHelper(str string) string {
+	bv := []byte(str)
+	hasher := sha1.New()
+	hasher.Write(bv)
+	return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+}
+
 func InterviewCheckIn(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 
 	// ERROR HANDLING
 
 	log.Printf("interview_check_in api called with [%s]\n", params)
-	if len(params["company_name"]) == 0 || params["company_name"][0] == "" ||
+	if len(params["company_name"]) ==0  || params["company_name"][0] == "" ||
 	   len(params["display_name"]) == 0 || params["display_name"][0] == "" ||
 	   len(params["major"]) == 0 /*|| params["major"][0] == ""*/ ||
 	   len(params["class"]) == 0 /*|| params["class"][0] == ""*/ ||
@@ -95,6 +104,9 @@ func InterviewCheckIn(w http.ResponseWriter, r *http.Request){
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+
+	// First thing's first, hash the VT_ID (90- number)
+	hashedId := hashHelper(params["VT_ID"][0])
 
 	dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
 	if err != nil {
@@ -106,7 +118,7 @@ func InterviewCheckIn(w http.ResponseWriter, r *http.Request){
 
 	// END ERROR HANDLING
 
-	addedStudent, err := dbutil.AddStudent(dbconn, params["display_name"][0], params["major"][0], params["class"][0], params["VT_ID"][0])
+	addedStudent, err := dbutil.AddStudent(dbconn, params["display_name"][0], params["major"][0], params["class"][0], hashedId)
 	if err != nil {
 		log.Printf("Could not add student to database: %s\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
@@ -119,7 +131,7 @@ func InterviewCheckIn(w http.ResponseWriter, r *http.Request){
 		log.Printf("Student already exists in database\n")
 	}
 
-	addedInterview, err := dbutil.AddInterview(dbconn, params["VT_ID"][0], params["company_name"][0])
+	addedInterview, err := dbutil.AddInterview(dbconn, hashedId, params["company_name"][0])
 	if err != nil {
 		log.Printf("Could not add interview to database: %s\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
