@@ -17,7 +17,7 @@ export class SwipeComponent implements OnInit {
   ngOnInit() {
     document.getElementById("pid_input").focus();
   }
-  onKey(event: any) { // without type info
+  onKey(event: any) { 
     var input = event.target.value;
     if (input.length < 9) {
       this.pid = event.target.value;
@@ -30,19 +30,22 @@ export class SwipeComponent implements OnInit {
     }
     event.target.value = this.pid;
     if (this.pid.length == 9 && /^\d+$/.test(this.pid)) {
-      var student = this.http.get("https://csrcint.cs.vt.edu/api/get_student?VT_ID=" + this.pid).subscribe((res) => {
+      this.http.get("https://csrcint.cs.vt.edu/api/get_student?VT_ID=" + this.pid).subscribe((res) => {
         
         this.student_info = res;
 
       });
-      let stateData = {
-        pid: this.pid,
-        student: this.student_info.dispName,
-        class: this.student_info.class,
-        major: this.student_info.major
-      }
+      if (this.student_info != undefined) {
+        let stateData = {
+          pid: this.pid,
+          student: this.student_info.dispName,
+          class: this.student_info.class,
+          major: this.student_info.major
+        }
 
-      this.router.navigate(['/select'], { state: stateData });
+        this.router.navigate(['/select'], { state: stateData });
+      }
+      
     }
   }
 }

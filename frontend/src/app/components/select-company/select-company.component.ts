@@ -1,11 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 import { Component, AfterViewInit, ComponentFactoryResolver, ViewChild, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router, ActivatedRoute, NavigationStart } from '@angular/router';
-import { SelectCompanyTileComponent } from "../select-company-tile/select-company-tile.component"
+import { Router} from '@angular/router';
+import { SelectCompanyTileComponent } from '../select-company-tile/select-company-tile.component';
+
 
 @Component({
   selector: 'app-select-company',
@@ -23,7 +20,8 @@ export class SelectCompanyComponent implements AfterViewInit {
   constructor(private http: HttpClient, private router: Router, private vcr: ViewContainerRef, private cfr: ComponentFactoryResolver) {
     this.stateData = this.router.getCurrentNavigation().extras.state;
     if(this.stateData == null || this.stateData.pid == null){
-      console.log("Invalid state has been passed (or not passed at all); should redirect to '/'")
+      console.log("Invalid state has been passed (or not passed at all); should redirect to '/'");
+      this.router.navigate(['/']);
     }
   }
 

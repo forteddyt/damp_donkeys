@@ -12,14 +12,16 @@ export class ReviewScreenComponent implements OnInit {
   constructor(private router: Router) {
   	this.stateData = this.router.getCurrentNavigation().extras.state;
     if(this.stateData == null || this.stateData.pid == null || this.stateData.companyName == null){
-      console.log("Invalid state has been passed (or not passed at all); should redirect to '/'")
+      console.log("Invalid state has been passed (or not passed at all); should redirect to '/'");
+      this.router.navigate(['/']);
     }else{
     	console.log(this.stateData)
     }
   }
 
-  ngOnInit() {
-  	console.log()
-  }
+  ngOnInit() { }
 
+  submitInterview(event: any) {
+    console.log("Submit the Interview Details");
+  }
 }
