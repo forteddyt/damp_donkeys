@@ -79,7 +79,7 @@ func AddEmployer(db *sql.DB, name string, password string) (bool, error) {
 }
 
 func CheckStudent(db *sql.DB, idnumber string) (bool, error){
-	stmt, err := db.Prepare("SELECT displayname FROM Students WHERE idnumber = ?;")
+	stmt, err := db.Prepare("SELECT ID FROM Students WHERE idnumber = ?;")
 	if err != nil {
 		return false, err
 	}
@@ -97,19 +97,21 @@ func AddStudent(db *sql.DB, displayname string, major string, class string, idnu
 	if err !=  nil {
 		return false, err;	
 	}
-	isAddedStudent, err := addStudentToCurrentCareerFair(db, displayname, major, class, idnumber)
 	if err != nil {
 		return false, err;
 	}
-	if isValidStudent || isAddedStudent {
-		return false, nil;
-	}	
-        stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(?);")
-        res, err := stmt.Exec(idnumber)
-	_ = res
-        if err != nil {
-                return false, err;
+	if !isValidStudent {
+		stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(?);")
+        	res, err := stmt.Exec(idnumber)
+		_ = res
+       		if err != nil {
+                	return false, err;
+		}
         }
+	isAddedStudent, err := addStudentToCurrentCareerFair(db, displayname, major, class, idnumber)
+	if !isAddedStudent || err != nil {
+		return false, err;
+	}
 	return true, nil;
 }
 
@@ -250,7 +252,7 @@ func UpdatePassword(db *sql.DB, name string, password string) (bool, error) {
 }
 
 func addStudentToCurrentCareerFair(db *sql.DB, displayname string, major string, class string, idnumber string) (bool, error) {
-        stmt, err := db.Prepare("INSERT INTO StudentsCareerFairs(StudentID, CareerFairID, displayname, major, class) VALUES((SELECT ID FROM Students WHERE idnumber = ?), (SELECT Max(ID) FROM CareerFair), ?, ?, ?);")
+        stmt, err := db.Prepare("INSERT INTO StudentsCareerFairs(StudentID, CareerFairID, displayname, major, class) VALUES((SELECT ID FROM Students WHERE idnumber = ?), (SELECT MAX(ID) FROM CareerFairs), ?, ?, ?);")
         res, err := stmt.Exec(idnumber, displayname, major, class)
         _ = res
         if err != nil {
