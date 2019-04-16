@@ -39,6 +39,7 @@ func main() {
 	router.HandleFunc("/get_student", GetStudent).Methods("GET")
 	router.HandleFunc("/company_check_ins", CompanyCheckIns).Methods("GET")
 	router.HandleFunc("/login", Login).Methods("GET")
+	router.HandleFunc("/interview_check_in", InterviewCheckIn).Methods("PUT")
 
 	c := cors.New(cors.Options{
 	    AllowedOrigins: []string{"https://csrcint.cs.vt.edu"},
@@ -78,6 +79,60 @@ func credentialSetup() error{
 	log.Println("Database password obtained!")
 
 	return nil
+}
+
+func InterviewCheckIn(w http.ResponseWriter, r *http.Request){
+	params := r.URL.Query()
+
+	// ERROR HANDLING
+
+	log.Printf("interview_check_in api called with [%s]\n", params)
+	if len(params["company_name"]) == 0 || params["company_name"][0] == "" ||
+	   len(params["display_name"]) == 0 || params["display_name"][0] == "" ||
+	   len(params["major"]) == 0 /*|| params["major"][0] == ""*/ ||
+	   len(params["class"]) == 0 /*|| params["class"][0] == ""*/ ||
+	   len(params["VT_ID"]) == 0 || params["VT_ID"][0] == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
+	if err != nil {
+		log.Printf("Database connection failed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer dbutil.CloseDB(dbconn)
+
+	// END ERROR HANDLING
+
+	addedStudent, err := dbutil.AddStudent(dbconn, params["display_name"][0], params["major"][0], params["class"][0], params["VT_ID"][0])
+	if err != nil {
+		log.Printf("Could not add student to database: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if addedStudent {
+		log.Printf("New student added to database\n")
+	} else  {
+		log.Printf("Student already exists in database\n")
+	}
+
+	addedInterview, err := dbutil.AddInterview(dbconn, params["VT_ID"][0], params["company_name"][0])
+	if err != nil {
+		log.Printf("Could not add interview to database: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if addedInterview {
+		log.Printf("New interview added to database\n")
+	} else  {
+		log.Printf("Interview already exists in database (THIS SHOULD NOT HAPPEN)\n")
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
