@@ -23,5 +23,6 @@ export class ReviewScreenComponent implements OnInit {
 
   submitInterview(event: any) {
     console.log("Submit the Interview Details");
+    this.router.navigate(["/"]);
   }
 }

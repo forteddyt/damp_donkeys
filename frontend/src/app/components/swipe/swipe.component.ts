@@ -33,19 +33,14 @@ export class SwipeComponent implements OnInit {
       this.http.get("https://csrcint.cs.vt.edu/api/get_student?VT_ID=" + this.pid).subscribe((res) => {
         
         this.student_info = res;
-
-      });
-      if (this.student_info != undefined) {
         let stateData = {
           pid: this.pid,
           student: this.student_info.dispName,
           class: this.student_info.class,
           major: this.student_info.major
         }
-
         this.router.navigate(['/select'], { state: stateData });
-      }
-      
+      });
     }
   }
 }
