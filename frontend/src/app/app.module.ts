@@ -17,6 +17,7 @@ import { StatisticsComponent } from './components/statistics/statistics.componen
 import { AddCompanyComponent } from './components/add-company/add-company.component';
 import { ViewCompanyComponent } from './components/view-company/view-company.component';
 import bootstrap from "bootstrap";
+import { InterviewComponent } from './components/interview/interview.component';
 
 @NgModule({
   declarations: [
@@ -33,10 +34,12 @@ import bootstrap from "bootstrap";
     StatisticsComponent,
     AddCompanyComponent,
     ViewCompanyComponent,
-    SelectCompanyTileComponent
+    SelectCompanyTileComponent,
+    InterviewComponent
   ],
   entryComponents: [
-    SelectCompanyTileComponent
+    SelectCompanyTileComponent,
+    InterviewComponent
   ],
   imports: [
     BrowserModule,
