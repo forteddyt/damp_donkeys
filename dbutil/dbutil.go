@@ -20,15 +20,15 @@ import (
 
 //Struct Type For Students
 type Student struct {
-	displayname string `json:"display_name"`
-	major string `json:"major"`
-	class string `json:"class"`
-	idnumber string `json:"idnumber"`
+	DisplayName string `json:"display_name"`
+	Major string `json:"major"`
+	Class string `json:"class"`
+	IdNumber string `json:"idnumber"`
 }
 
 type Interview struct {
-	student Student `json:"student"`
-	time string `json:"time"`
+	Student Student `json:"student"`
+	Time string `json:"time"`
 }
 
 func OpenDB(databasename string, username string, password string) (*sql.DB, error) {
