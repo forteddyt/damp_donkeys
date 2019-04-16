@@ -46,7 +46,7 @@ func CloseDB(db *sql.DB) {
 }
 
 func CheckEmployer(db *sql.DB, employername string) (bool, error){
-        stmt, err := db.Prepare("SELECT name FROM Employers WHERE name = ?;")
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE name LIKE ?;")
         if err != nil {
                 return false, err
         }
@@ -64,8 +64,8 @@ func AddEmployer(db *sql.DB, name string, password string) (bool, error) {
 	if(err != nil) {
 		return false, err
 	}
+	addEmployersToCurrentCareerFair(db, name)
 	if isValidEmployer {
-		//Find and Add Employer to CareerFairsEmployers
 		return false, nil
 	}
 	stmt, err := db.Prepare("INSERT INTO Employers(name, password) VALUES(?, ?);")
@@ -97,7 +97,11 @@ func AddStudent(db *sql.DB, displayname string, major string, class string, idnu
 	if err !=  nil {
 		return false, err;	
 	}
-	if isValidStudent {
+	isAddedStudent, err := addStudentToCurrentCareerFair(db, displayname, major, class, idnumber)
+	if err != nil {
+		return false, err;
+	}
+	if isValidStudent || isAddedStudent {
 		return false, nil;
 	}	
         stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(?);")
@@ -242,7 +246,6 @@ func UpdatePassword(db *sql.DB, name string, password string) (bool, error) {
         if err != nil {
                 return false, err
         }
-        //Add Employer to CareerFairsEmployers Table
         return true, nil
 }
 
@@ -266,4 +269,50 @@ func addEmployersToCurrentCareerFair(db *sql.DB, name string) (bool, error) {
         return true, nil;
 }
 
+func getNumberOfStudents(db *sql.DB, fairname string) (int, error) {
+	var (
+                numStudents int
+        )
+        stmt, err := db.Prepare("SELECT COUNT(DISTINCT(StudentID)) FROM StudentsCareerFairs WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE fairname);")
+        if err != nil {
+                return -1, err
+        }
+        defer stmt.Close()
+        rows, err := stmt.Query()
+        if err != nil {
+                return -1, err
+        }
+        defer rows.Close()
+        err = rows.Scan(&numStudents)
+        if err != nil {
+                return -1, err
+        }
+        if err = rows.Err(); err != nil {
+                return -1 , err
+        }
+        return numStudents, nil
+}
 
+func getNumberOfInterviews(db *sql.DB, fairname string) (int, error) {
+        var (
+                numInterviews int
+        )
+        stmt, err := db.Prepare("SELECT COUNT(StudentID) FROM Interviews WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE fairname);")
+        if err != nil {
+                return -1, err
+        }
+        defer stmt.Close()
+        rows, err := stmt.Query()
+        if err != nil {
+                return -1, err
+        }
+        defer rows.Close()
+        err = rows.Scan(&numInterviews)
+        if err != nil {
+                return -1, err
+        }
+        if err = rows.Err(); err != nil {
+                return -1, err
+        }
+        return numInterviews, nil
+}
