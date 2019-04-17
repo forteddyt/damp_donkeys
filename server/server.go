@@ -40,6 +40,11 @@ type AddEmployerResp struct {
 	JWT string `json:"jwt"`
 }
 
+type CareerFairListResp struct {
+	CareerFairList []string `json:"career_fair_list"`
+	JWT string `json:"jwt"`
+}
+
 func main() {
 	log.Print("Starting server...")
 
@@ -52,6 +57,8 @@ func main() {
 	router.HandleFunc("/get_student", GetStudent).Methods("GET")
 	router.HandleFunc("/company_check_ins", CompanyCheckIns).Methods("GET")
 	router.HandleFunc("/login", Login).Methods("GET")
+	router.HandleFunc("/career_fair_list", GetCareerFairList).Methods("GET")
+
 	router.HandleFunc("/interview_check_in", InterviewCheckIn).Methods("PUT")
 	router.HandleFunc("/add_employer", AddEmployer).Methods("PUT")
 
@@ -113,12 +120,84 @@ func genCode(codeLength int) string {
 	return string(bv)
 }
 
+func GetCareerFairList(w http.ResponseWriter, r *http.Request){
+	params := r.URL.Query()
+
+	// -> ERROR HANDLING
+	log.Printf("interview_check_in api called with [%s]\n", params)
+	if len(params["jwt"]) == 0 || params["jwt"][0] == "" {
+		log.Printf("Missing paramaters\n")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// -> JWT ERROR HANDLING
+	old_jwt := params["jwt"][0]
+	is_valid, err := jwtutil.IsValidToken(old_jwt)
+	if !is_valid {
+		log.Printf("JWT Token invalid: %s\n", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	claims, err := jwtutil.ParseClaims(old_jwt)
+
+	// Something went wrong internally
+	if err != nil {
+		log.Printf("ParseClaims error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	jwt_user := claims.User
+	// Only admins should be able to add a company
+	if jwt_user != "admin" {
+		// Note: Hard coded "admin" could (/should) eventually be replaced with a cross check to some 'Admins' Table in the db 
+		log.Printf("JWT invalid for requested user [%s != %s]\n", jwt_user, "admin")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	new_jwt, err := jwtutil.RefreshToken(old_jwt, JWT_DURATION)
+
+	if err != nil {
+		log.Printf("RefreshToken error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// <- END JWT ERROR HANDLING
+
+	dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
+	if err != nil {
+		log.Printf("Database connection failed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer dbutil.CloseDB(dbconn)
+
+	career_fair_list, err := dbutil.ShowCareerFairsByName(dbconn)
+
+	if err != nil {
+		log.Printf("Could not get career fairs from database: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resp := &CareerFairListResp {
+		CareerFairList: career_fair_list,
+		JWT: new_jwt,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
+}
+
 func AddEmployer(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 
 	// -> ERROR HANDLING
 	log.Printf("interview_check_in api called with [%s]\n", params)
-	if len(params["company_name"]) ==0  || params["company_name"][0] == "" ||
+	if len(params["company_name"]) == 0  || params["company_name"][0] == "" ||
 		len(params["jwt"]) == 0 || params["jwt"][0] == "" {
 		log.Printf("Missing paramaters\n")
 		w.WriteHeader(http.StatusBadRequest)
