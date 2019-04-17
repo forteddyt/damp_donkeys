@@ -2,15 +2,18 @@ package main
 
 import (
 	"os"
-	"io/ioutil"
 	"log"
 	"errors"
+
 	"net/http"
+	"math/rand"
+	"io/ioutil"
 	"crypto/sha1"
 	"encoding/json"
 	"encoding/base64"
-	"github.com/gorilla/mux"
+	
 	"github.com/rs/cors"
+	"github.com/gorilla/mux"
 	"github.com/damp_donkeys/edidutil"
 	"github.com/damp_donkeys/jwtutil"
 	"github.com/damp_donkeys/dbutil"
@@ -18,6 +21,8 @@ import (
 
 const(
 	JWT_DURATION = 30 // In minutes. How long the token will stay valid between requests
+	USER_CODE_LENGTH = 5 // How long user / company unique codes should be
+	USER_CODE_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" // The characters allowed in the unique codes
 )
 
 // Credentials obtained from .gitignored files on server startup
@@ -26,6 +31,12 @@ var DBPassword, DBUsername string
 type CheckInResp struct {
 	CompanyName string `json:"company_name"`
 	Students []dbutil.Interview `json:"students"`
+	JWT string `json:"jwt"`
+}
+
+type AddEmployerResp struct {
+	CompanyName string `json:"company_name`
+	UserCode string `json:"user_code"`
 	JWT string `json:"jwt"`
 }
 
@@ -42,6 +53,7 @@ func main() {
 	router.HandleFunc("/company_check_ins", CompanyCheckIns).Methods("GET")
 	router.HandleFunc("/login", Login).Methods("GET")
 	router.HandleFunc("/interview_check_in", InterviewCheckIn).Methods("PUT")
+	router.HandleFunc("/add_employer", AddEmployer).Methods("PUT")
 
 	c := cors.New(cors.Options{
 	    AllowedOrigins: []string{"https://csrcint.cs.vt.edu"},
@@ -90,6 +102,109 @@ func hashHelper(str string) string {
 	return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 }
 
+func genCode(codeLength int) string {
+	// 26 lowercase + 26 uppercase + 10 digit possibilities
+	bv := make([]byte, codeLength)
+
+	for i := range bv {
+		bv[i] = USER_CODE_CHARS[rand.Int63() % int64(len(USER_CODE_CHARS))]
+	}
+
+	return string(bv)
+}
+
+func AddEmployer(w http.ResponseWriter, r *http.Request){
+	params := r.URL.Query()
+
+	// -> ERROR HANDLING
+	log.Printf("interview_check_in api called with [%s]\n", params)
+	if len(params["company_name"]) ==0  || params["company_name"][0] == "" ||
+		len(params["jwt"]) == 0 || params["jwt"][0] == "" {
+		log.Printf("Missing paramaters\n")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// -> JWT ERROR HANDLING
+	old_jwt := params["jwt"][0]
+	is_valid, err := jwtutil.IsValidToken(old_jwt)
+	if !is_valid {
+		log.Printf("JWT Token invalid: %s\n", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	claims, err := jwtutil.ParseClaims(old_jwt)
+
+	// Something went wrong internally
+	if err != nil {
+		log.Printf("ParseClaims error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	jwt_user := claims.User
+	// Only admins should be able to add a company
+	if jwt_user != "admin" {
+		// Note: Hard coded "admin" could (/should) eventually be replaced with a cross check to some 'Admins' Table in the db 
+		log.Printf("JWT invalid for requested user [%s != %s]\n", jwt_user, "admin")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	new_jwt, err := jwtutil.RefreshToken(old_jwt, JWT_DURATION)
+
+	if err != nil {
+		log.Printf("RefreshToken error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// <- END JWT ERROR HANDLING
+
+	dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
+	if err != nil {
+		log.Printf("Database connection failed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer dbutil.CloseDB(dbconn)
+
+	// Try to generate a unique code for the company. Try up to 10 times
+	addedCompany := false
+	err = nil
+	var userCode string
+	var attempts int
+	for attempts = 0; attempts < 10 && err == nil && !addedCompany; attempts++ {
+		userCode = genCode(USER_CODE_LENGTH)
+		hashedUserCode := hashHelper(userCode)
+
+		addedCompany, err = dbutil.AddEmployer(dbconn, params["company_name"][0], hashedUserCode)
+	}
+	if attempts >= 10 {
+		log.Printf("Could not add company to database: Exceeded code generation attempts\n")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err != nil {
+		log.Printf("Could not add company to database: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// <- END ERROR HANDLING
+
+	resp := &AddEmployerResp {
+		CompanyName: params["company_name"][0],
+		UserCode: userCode,
+		JWT: new_jwt,
+	}
+
+	// Comment out this print after testing
+	log.Printf("Generated code \"%s\" for company \"%s\"", resp.UserCode, resp.CompanyName)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
+}
+
 func InterviewCheckIn(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 
@@ -101,6 +216,7 @@ func InterviewCheckIn(w http.ResponseWriter, r *http.Request){
 	   len(params["major"]) == 0 /*|| params["major"][0] == ""*/ ||
 	   len(params["class"]) == 0 /*|| params["class"][0] == ""*/ ||
 	   len(params["VT_ID"]) == 0 || params["VT_ID"][0] == "" {
+		log.Printf("Missing paramaters\n")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
