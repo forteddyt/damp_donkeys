@@ -40,6 +40,8 @@ type AddCompanyResp struct {
 	JWT string `json:"jwt"`
 }
 
+type PutResetCodeResp AddCompanyResp // Same as AddCompanyResp, just different name
+
 type CareerFairListResp struct {
 	CareerFairList []string `json:"career_fair_list"`
 	JWT string `json:"jwt"`
@@ -61,7 +63,7 @@ func main() {
 
 	router.HandleFunc("/interview_check_in", InterviewCheckIn).Methods("PUT")
 	router.HandleFunc("/add_company", AddCompany).Methods("PUT")
-	// router.HandleFunc("/reset_code").Methods("PUT")
+	router.HandleFunc("/reset_code", PutResetCode).Methods("PUT")
 
 	router.HandleFunc("/delete_company", DeleteCompany).Methods("DELETE")
 
@@ -121,6 +123,97 @@ func genCode(codeLength int) string {
 	}
 
 	return string(bv)
+}
+
+func PutResetCode(w http.ResponseWriter, r *http.Request){
+	params := r.URL.Query()
+
+	// -> ERROR HANDLING
+	if len(params["company_name"]) == 0 || params["company_name"][0] == "" ||
+		len(params["jwt"]) == 0 || params["jwt"][0] == "" {
+		log.Printf("Missing paramaters\n")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// -> JWT ERROR HANDLING
+	old_jwt := params["jwt"][0]
+	is_valid, err := jwtutil.IsValidToken(old_jwt)
+	if !is_valid {
+		log.Printf("JWT Token invalid: %s\n", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	claims, err := jwtutil.ParseClaims(old_jwt)
+
+	// Something went wrong internally
+	if err != nil {
+		log.Printf("ParseClaims error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	jwt_user := claims.User
+	// Only admins should be able to add a company
+	if jwt_user != "admin" {
+		// Note: Hard coded "admin" could (/should) eventually be replaced with a cross check to some 'Admins' Table in the db 
+		log.Printf("JWT invalid for requested user [%s != %s]\n", jwt_user, "admin")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	new_jwt, err := jwtutil.RefreshToken(old_jwt, JWT_DURATION)
+
+	if err != nil {
+		log.Printf("RefreshToken error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// <- END JWT ERROR HANDLING
+
+	dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
+	if err != nil {
+		log.Printf("Database connection failed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer dbutil.CloseDB(dbconn)
+
+	// Try to generate a unique code for the company. Try up to 10 times
+	updated := false
+	err = nil
+	var userCode string
+	var attempts int
+	for attempts = 0; attempts < 10 && err == nil && !updated; attempts++ {
+		userCode = genCode(USER_CODE_LENGTH)
+		hashedUserCode := hashHelper(userCode)
+
+		updated, err = dbutil.UpdatePassword(dbconn, params["company_name"][0], hashedUserCode)
+	}
+	if attempts >= 10 {
+		log.Printf("Could not add company to database: Exceeded code generation attempts\n")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err != nil {
+		log.Printf("Could not add company to database: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// <- END ERROR HANDLING
+
+	resp := &PutResetCodeResp {
+		CompanyName: params["company_name"][0],
+		UserCode: userCode,
+		JWT: new_jwt,
+	}
+
+	// Comment out this print after testing
+	log.Printf("Generated code \"%s\" for company \"%s\"", resp.UserCode, resp.CompanyName)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
 }
 
 func DeleteCompany(w http.ResponseWriter, r *http.Request){
