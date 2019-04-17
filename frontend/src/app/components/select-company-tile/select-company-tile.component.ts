@@ -12,7 +12,7 @@ export class SelectCompanyTileComponent  {
   stateData
   constructor(private router: Router) { }
 
-  reviewRedirect() {
+  reviewRedirect(event: any) {
   	// Append companyName to stateData
   	this.stateData.companyName = this.companyName
   	this.router.navigate(['/review'], { state: this.stateData })
