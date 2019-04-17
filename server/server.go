@@ -154,7 +154,6 @@ func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
 	if len(params["jwt"]) == 0 || params["jwt"][0] == "" ||
 		len(params["company_name"]) == 0 || params["company_name"][0] == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{})
 		return
 	}
 
@@ -168,7 +167,6 @@ func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
 	if !is_valid {
 		log.Printf("JWT Token invalid: %s\n", err)
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{})
 		return
 	}
 
@@ -178,7 +176,6 @@ func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		log.Printf("ParseClaims error: \n", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{})
 		return
 	}
 
@@ -187,7 +184,6 @@ func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
 	if jwt_user != company_name {
 		log.Printf("JWT invalid for requested company [%s != %s]\n", jwt_user, company_name)
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]string{})
 		return
 	}
 
@@ -196,7 +192,6 @@ func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		log.Printf("RefreshToken error: \n", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{})
 		return
 	}
 
@@ -206,7 +201,6 @@ func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		log.Printf("Database connection failed: %s\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{})
 		return
 	}
 	defer dbutil.CloseDB(dbconn)
@@ -216,7 +210,6 @@ func CompanyCheckIns(w http.ResponseWriter, r *http.Request){
 	if err != nil {
 		log.Printf("Could not get checked in students from database: %s\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(map[string]string{})
 		return
 	}
 
@@ -246,7 +239,6 @@ func GetStudent(w http.ResponseWriter, r *http.Request){
 	log.Printf("get_student api called with [%s]\n", params)
 	if len(params["VT_ID"]) == 0 || params["VT_ID"][0] == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{})
 		return
 	}
 
@@ -269,14 +261,12 @@ func Login(w http.ResponseWriter, r *http.Request){
 	// Client request error
 	if len(params["password_hash"]) == 0 || params["password_hash"][0] == "" {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{})
 	} else {
 		givenPwdHash := params["password_hash"][0]
 		dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
 		if err != nil {
 			log.Printf("Database connection failed: %s\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{})
 			return
 		}
 		defer dbutil.CloseDB(dbconn)
@@ -286,7 +276,6 @@ func Login(w http.ResponseWriter, r *http.Request){
 		if err != nil {
 			log.Printf("Could not get user from database: %s\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{})
 			return
 		}
 
@@ -294,7 +283,6 @@ func Login(w http.ResponseWriter, r *http.Request){
 		if user == "" {
 			log.Printf("No user with password hash '%s' found\n", givenPwdHash)
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(map[string]string{})
 			return
 		}
 
@@ -302,7 +290,6 @@ func Login(w http.ResponseWriter, r *http.Request){
 		if err != nil {
 			log.Printf("JWT Token creation failed: %s\n", err)
 			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]string{})
 			return
 		}
 
