@@ -61,6 +61,9 @@ func main() {
 
 	router.HandleFunc("/interview_check_in", InterviewCheckIn).Methods("PUT")
 	router.HandleFunc("/add_company", AddCompany).Methods("PUT")
+	// router.HandleFunc("/reset_code").Methods("PUT")
+
+	router.HandleFunc("/delete_company", DeleteCompany).Methods("DELETE")
 
 	c := cors.New(cors.Options{
 	    AllowedOrigins: []string{"https://csrcint.cs.vt.edu"},
@@ -118,6 +121,69 @@ func genCode(codeLength int) string {
 	}
 
 	return string(bv)
+}
+
+func DeleteCompany(w http.ResponseWriter, r *http.Request){
+	params := r.URL.Query()
+
+	// -> ERROR HANDLING
+	if len(params["company_name"]) == 0 || params["company_name"][0] == "" ||
+		len(params["jwt"]) == 0 || params["jwt"][0] == "" {
+		log.Printf("Missing paramaters\n")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// -> JWT ERROR HANDLING
+	old_jwt := params["jwt"][0]
+	is_valid, err := jwtutil.IsValidToken(old_jwt)
+	if !is_valid {
+		log.Printf("JWT Token invalid: %s\n", err)
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	claims, err := jwtutil.ParseClaims(old_jwt)
+
+	// Something went wrong internally
+	if err != nil {
+		log.Printf("ParseClaims error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	jwt_user := claims.User
+	// Only admins should be able to add a company
+	if jwt_user != "admin" {
+		// Note: Hard coded "admin" could (/should) eventually be replaced with a cross check to some 'Admins' Table in the db 
+		log.Printf("JWT invalid for requested user [%s != %s]\n", jwt_user, "admin")
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	new_jwt, err := jwtutil.RefreshToken(old_jwt, JWT_DURATION)
+
+	if err != nil {
+		log.Printf("RefreshToken error: \n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// <- END JWT ERROR HANDLING
+
+	dbconn, err := dbutil.OpenDB("dev", DBUsername, DBPassword)
+	if err != nil {
+		log.Printf("Database connection failed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer dbutil.CloseDB(dbconn)
+
+	log.Printf("%s\n", new_jwt)
+
+	// company_removed, err := dbutil.RemoveEmployer(dbconn, params["company_name"][0])
+	// <- ERROR HANDLING
+
+	// Remainder will be written once RemoveEmployer is implemented
 }
 
 func GetCareerFairList(w http.ResponseWriter, r *http.Request){
