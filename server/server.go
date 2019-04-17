@@ -34,7 +34,7 @@ type CheckInResp struct {
 	JWT string `json:"jwt"`
 }
 
-type AddEmployerResp struct {
+type AddCompanyResp struct {
 	CompanyName string `json:"company_name`
 	UserCode string `json:"user_code"`
 	JWT string `json:"jwt"`
@@ -60,7 +60,7 @@ func main() {
 	router.HandleFunc("/career_fair_list", GetCareerFairList).Methods("GET")
 
 	router.HandleFunc("/interview_check_in", InterviewCheckIn).Methods("PUT")
-	router.HandleFunc("/add_employer", AddEmployer).Methods("PUT")
+	router.HandleFunc("/add_company", AddCompany).Methods("PUT")
 
 	c := cors.New(cors.Options{
 	    AllowedOrigins: []string{"https://csrcint.cs.vt.edu"},
@@ -192,7 +192,7 @@ func GetCareerFairList(w http.ResponseWriter, r *http.Request){
 	json.NewEncoder(w).Encode(resp)
 }
 
-func AddEmployer(w http.ResponseWriter, r *http.Request){
+func AddCompany(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 
 	// -> ERROR HANDLING
@@ -272,7 +272,7 @@ func AddEmployer(w http.ResponseWriter, r *http.Request){
 	}
 	// <- END ERROR HANDLING
 
-	resp := &AddEmployerResp {
+	resp := &AddCompanyResp {
 		CompanyName: params["company_name"][0],
 		UserCode: userCode,
 		JWT: new_jwt,
