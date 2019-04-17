@@ -12,7 +12,7 @@ export class ReviewScreenComponent implements OnInit {
   constructor(private router: Router, private http: HttpClient) {
   	this.stateData = this.router.getCurrentNavigation().extras.state;
     if(this.stateData == null || this.stateData.pid == null || this.stateData.companyName == null){
-      console.log("Invalid state has been passed (or not passed at all); should redirect to '/'");
+      //console.log("Invalid state has been passed (or not passed at all); should redirect to '/'");
       this.router.navigate(['/']);
     }
   }

@@ -30,6 +30,8 @@ export class CompanyUniqueComponent implements OnInit {
     this.code = this.route.snapshot.params.code;
     var student = this.http.get("https://csrcint.cs.vt.edu/api/login?password_hash=test").subscribe((res) => {
       //console.log(res);
+      //var res = await this.getUser();
+      //this.json = res.body["jwt"];
       this.json = res["jwt"];
       //this.json_middle = this.json.split('.')[1];
       var decoded = jwt_decode(this.json);
@@ -51,26 +53,43 @@ export class CompanyUniqueComponent implements OnInit {
     //}
   }
 
+  getUser()
+  {
+    return this.http.get("https://csrcint.cs.vt.edu/api/login?password_hash=test", {observe: 'response'}).toPromise();
+  }
+
+
   async ngAfterViewInit() {
-    const resp = /*await*/ this.getNames();
+    //const resp = /*await*/ this.getNames();
 
     //console.log(resp.status)
-    this.companyList = resp['interviewees'];//.body
+    //this.companyList = resp['interviewees'];//.body
     //console.log(this.companyList);
+    //this.loadComponents();
+    //while (this.json == undefined) {}
+
+    //var res = await this.getUser();
+
+    //console.log(this.json);
+    const resp = await this.getNames();
+
+    //console.log(resp.status);
+    this.companyList = resp.body['students'];
     this.loadComponents();
   }
 
   getNames()
   {
-    return this.api_call_return;
+    return this.http.get("https://csrcint.cs.vt.edu/api/company_check_ins?company_name=" + this.company_name + "&jwt=" + this.json, {observe: 'response'}).toPromise();
+    // update jwt
   }
 
   loadComponents() {
-    console.log(this.companyList);
+    //console.log(this.companyList);
     const cFactory = this.cfr.resolveComponentFactory(InterviewComponent);
     //this.companyInsert.clear();
     for(var i in this.companyList){
-      console.log("for loop executed");
+      //console.log("for loop executed");
       const companyComponent = <InterviewComponent>this.companyInsert.createComponent(cFactory).instance;
 
       companyComponent.name = this.companyList[i]['name'];
