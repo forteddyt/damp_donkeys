@@ -20,7 +20,7 @@ export class SelectCompanyComponent implements AfterViewInit {
   constructor(private http: HttpClient, private router: Router, private vcr: ViewContainerRef, private cfr: ComponentFactoryResolver) {
     this.stateData = this.router.getCurrentNavigation().extras.state;
     if(this.stateData == null || this.stateData.pid == null){
-      console.log("Invalid state has been passed (or not passed at all); should redirect to '/'");
+      console.log("Invalid state has been passed (or not passed at all);"+this.stateData);
       this.router.navigate(['/']);
     }
   }
@@ -28,8 +28,8 @@ export class SelectCompanyComponent implements AfterViewInit {
   async ngAfterViewInit() {
     const resp = await this.getCompanies();
     
-    console.log(resp.status)
-    this.companyList = resp.body
+    //console.log(resp.status)
+    this.companyList = resp.body;
     this.loadComponents()
   }
 
@@ -38,7 +38,7 @@ export class SelectCompanyComponent implements AfterViewInit {
   }
 
   loadComponents() {
-    console.log(this.companyList)
+    //console.log(this.companyList)
     const cFactory = this.cfr.resolveComponentFactory(SelectCompanyTileComponent);
     this.companyInsert.clear();
     for(var i in this.companyList){

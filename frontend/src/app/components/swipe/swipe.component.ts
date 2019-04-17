@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-swipe',
@@ -9,7 +9,6 @@ import { Router, ActivatedRoute, NavigationExtras } from '@angular/router';
 })
 export class SwipeComponent implements OnInit {
   title = "Swipe your card or Enter your 90-number"
-  PIDInput = "Enter your 90-number"
   pid = ''
   student_info
   constructor(private http: HttpClient, private router: Router, private route: ActivatedRoute) { }
