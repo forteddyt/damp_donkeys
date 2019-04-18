@@ -14,6 +14,7 @@ func DeleteCompany(w http.ResponseWriter, r *http.Request){
 
 	// -> ERROR HANDLING
 	if len(params["company_name"]) == 0 || params["company_name"][0] == "" ||
+	   len(params["career_fair_name"]) == 0 || params["career_fair_name"][0] == "" ||
 		len(params["jwt"]) == 0 || params["jwt"][0] == "" {
 		log.Printf("Missing paramaters\n")
 		w.WriteHeader(http.StatusBadRequest)
@@ -42,9 +43,32 @@ func DeleteCompany(w http.ResponseWriter, r *http.Request){
 	defer dbutil.CloseDB(dbconn)
 
 	log.Printf("%s\n", new_jwt)
+	
+	interviews, err := dbutil.ShowStudents(dbconn, params["company_name"][0])
+	if err != nil {
+		log.Printf("Could not get students for given company: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	// If admin tries to delete a company with interviews
+	if len(interviews) > 0 {
+		log.Printf("Cannot remove company that has held a interviews\n")
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
 
-	// company_removed, err := dbutil.RemoveEmployer(dbconn, params["company_name"][0])
+	deleted, err := dbutil.DeleteEmployer(dbconn, params["company_name"][0], params["career_fair_name"][0])
+	if err != nil {
+		log.Printf("Could not delete company from career fair: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	// <- ERROR HANDLING
-
-	// Remainder will be written once RemoveEmployer is implemented
+	
+	if !deleted {
+		log.Printf("Did not delete company from career fair\n")
+	} else {
+		log.Printf("Deleted company from career fair\n")
+	}
+	w.WriteHeader(http.StatusOK)
 }
