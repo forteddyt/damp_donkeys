@@ -240,6 +240,13 @@ func UpdatePassword(db *sql.DB, name string, password string) (bool, error) {
 }
 
 func addStudentToCurrentCareerFair(db *sql.DB, displayname string, major string, class string, idnumber string) (bool, error) {
+	isAdded, err := CheckStudentsCareerFairs(db, idnumber) 
+	if err != nil {
+		return false, err;
+	}
+	if isAdded {
+		return false, nil;
+	}
         stmt, err := db.Prepare("INSERT INTO StudentsCareerFairs(StudentID, CareerFairID, displayname, major, class) VALUES((SELECT ID FROM Students WHERE HEX(idnumber) = ?), (SELECT MAX(ID) FROM CareerFairs), ?, ?, ?);")
         res, err := stmt.Exec(idnumber, displayname, major, class)
         _ = res
@@ -308,7 +315,7 @@ func ShowEmployersInterviewing(db *sql.DB, fairname string) ([]string, error) {
         var (
                 name string
         )
-        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT DISTINCT(EmployerID) FROM Interviews WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE ?));")
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT DISTINCT(EmployerID) FROM Interviews WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE ?)); ORDER BY name DESC")
         if err != nil {
                 return nil, err
         }
@@ -356,4 +363,18 @@ func DeleteEmployer(db *sql.DB, empname string, fairname string) (bool, error)  
                 return false, err
         }
         return true, nil
+}
+
+func CheckStudentsCareerFairs(db *sql.DB, idnumber string) (bool, error){
+    stmt, err := db.Prepare("SELECT StudentID FROM StudentsCareerFairs WHERE StudentID = (SELECT ID FROM Students WHERE HEX(idnumber) = ?);")
+    if err != nil {
+        return false, err
+    }
+    defer stmt.Close()
+    rows, err := stmt.Query(idnumber)
+    if err != nil {
+        return false, err
+    }
+    defer rows.Close()
+    return rows.Next(), nil
 }
