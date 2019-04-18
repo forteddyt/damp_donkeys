@@ -3,19 +3,69 @@ package dbutil
 import (
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
+    //"fmt"
 )
 
 //func main() {
-//	db, err := OpenDB()
-//	if err != nil {
-//		fmt.Println("Failed to Open")
-//	}
-//	defer CloseDB(db)
-//	name, err := CheckPasswordHash(db, "abc123")
-//	if err != nil {
-//		fmt.Println("Error")
-//	}
-//	fmt.Println(name)
+	//db, err := OpenDB("STUFF", "stuff", "StUfF")
+	//if err != nil {
+	//	fmt.Println("Failed to Open")
+	//}
+	//defer CloseDB(db)
+	//Testing
+	//Admin
+	//isStarted, err := StartCareerFair(db, "Overall Test 1", "NO COMMENTS")
+	//if !isStarted || err != nil {
+	//	fmt.Println(err)
+	//}
+	//isAddedEmployer, err := AddEmployer(db, "OverallEmployer", "7AB7FEA73C1F4768E8DF6B7C944C50E9607A4A1B")
+	//if !isAddedEmployer || err != nil {
+	//	fmt.Println(err)
+	//}
+	//isUpdated, err := UpdatePassword(db, "OverallEmployer", "5FB8319E3C71287EA6DF060B6B597BED555643F9")
+	//if !isUpdated || err != nil {
+	//	fmt.Println(err)
+	//}
+	//employer, err := CheckPasswordHash(db, "5FB8319E3C71287EA6DF060B6B597BED555643F9")	
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(employer)
+	//fairs, err := ShowCareerFairsByName(db)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//students, err := GetNumberOfStudents(db, "TestMethods")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(students)
+	//interviews, err := GetNumberOfInterviews(db, "Overall Test 1")
+        //if err != nil {
+        //        fmt.Println(err)
+        //}
+        //fmt.Println(interviews)
+	//fmt.Println(fairs)
+	//Student
+	//employers, err := ShowEmployersToStudents(db)	
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(employers)
+	//isAdded, err := AddInterview(db, "573CCF70469A7FDFDFF2AF27BAA552A25EA1793F", "OverallEmployer")
+	//if !isAdded || err != nil {
+	//	fmt.Println(err)
+	//}
+	//Employer
+	//employers, err := ShowEmployersInterviewing(db, "Overall Test 1") 
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//fmt.Println(employers)
+	//isUpdated, err := UpdateEmployerName(db, "IBM", "USA")
+	//if !isUpdated || err != nil {
+	//	fmt.Println(err)
+	//}
 //}
 
 //Struct Type For Students
@@ -64,22 +114,23 @@ func AddEmployer(db *sql.DB, name string, password string) (bool, error) {
 	if(err != nil) {
 		return false, err
 	}
-	addEmployersToCurrentCareerFair(db, name)
-	if isValidEmployer {
-		return false, nil
+	if !isValidEmployer {
+		stmt, err := db.Prepare("INSERT INTO Employers(name, password) VALUES(?, UNHEX(?));")
+		res, err := stmt.Exec(name, password)
+		_ = res
+		if err != nil {
+			return false, err
+		}
 	}
-	stmt, err := db.Prepare("INSERT INTO Employers(name, password) VALUES(?, ?);")
-	res, err := stmt.Exec(name, password)
-	_ = res
-	if err != nil {
+	isAddedEmployer, err := addEmployersToCurrentCareerFair(db, name)
+	if !isAddedEmployer || err != nil {
 		return false, err
 	}
-	//Add Employer to CareerFairsEmployers Table
 	return true, nil
 }
 
 func CheckStudent(db *sql.DB, idnumber string) (bool, error){
-	stmt, err := db.Prepare("SELECT ID FROM Students WHERE idnumber = ?;")
+	stmt, err := db.Prepare("SELECT ID FROM Students WHERE HEX(idnumber) = ?;")
 	if err != nil {
 		return false, err
 	}
@@ -101,7 +152,7 @@ func AddStudent(db *sql.DB, displayname string, major string, class string, idnu
 		return false, err;
 	}
 	if !isValidStudent {
-		stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(?);")
+		stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(UNHEX(?));")
         	res, err := stmt.Exec(idnumber)
 		_ = res
        		if err != nil {
@@ -116,7 +167,7 @@ func AddStudent(db *sql.DB, displayname string, major string, class string, idnu
 }
 
 func AddInterview(db *sql.DB, idnumber string, employername string) (bool, error)  {
-	stmt, err := db.Prepare("INSERT INTO Interviews (StudentID, EmployerID) SELECT s.ID, e.ID FROM Students s, Employers e WHERE s.idnumber = ? AND e.Name = ?;")
+	stmt, err := db.Prepare("INSERT INTO Interviews (StudentID, EmployerID, CareerFairID) SELECT s.ID, e.ID, c.ID FROM Students s, Employers e, CareerFairs c WHERE HEX(s.idnumber) = ? AND e.Name = ? AND c.ID = (SELECT MAX(ID) FROM CareerFairs);")
 	if err != nil {
 		return false, err
 	}
@@ -161,7 +212,7 @@ func ShowStudents(db *sql.DB, employername string) ([]Interview, error) {
 //Need to Test Methods Below
 func CheckPasswordHash(db *sql.DB, passhash string) (string, error) {
 	var name string
-	stmt, err := db.Prepare("SELECT name FROM Employers WHERE password = ?")
+	stmt, err := db.Prepare("SELECT name FROM Employers WHERE HEX(password) = ?")
 	if err != nil {
 		return "", err
 	}
@@ -185,16 +236,16 @@ func CheckPasswordHash(db *sql.DB, passhash string) (string, error) {
 	return name, nil;
 }
 
-func ShowEmployers(db *sql.DB, employername string) ([]string, error) {
+func ShowEmployersToStudents(db *sql.DB) ([]string, error) {
         var (
                 name string
         )
-        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT EmployerID FROM CareerFairsEmployers WHERE CareerFairID = (SELECT MAX(ID) FROM CareerFair));")
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT EmployerID FROM CareerFairsEmployers WHERE CareerFairID = (SELECT MAX(ID) FROM CareerFairs));")
         if err != nil {
                 return nil, err
         }
         defer stmt.Close()
-        rows, err := stmt.Query(employername)
+        rows, err := stmt.Query()
         if err != nil {
                 return nil, err
         }
@@ -242,7 +293,7 @@ func ShowCareerFairsByName(db *sql.DB) ([]string, error) {
 }
 
 func UpdatePassword(db *sql.DB, name string, password string) (bool, error) {
-        stmt, err := db.Prepare("UPDATE Employers SET password = ? WHERE name = ?")
+        stmt, err := db.Prepare("UPDATE Employers SET password = UNHEX(?) WHERE name = ?")
         res, err := stmt.Exec(password, name)
         _ = res
         if err != nil {
@@ -252,7 +303,7 @@ func UpdatePassword(db *sql.DB, name string, password string) (bool, error) {
 }
 
 func addStudentToCurrentCareerFair(db *sql.DB, displayname string, major string, class string, idnumber string) (bool, error) {
-        stmt, err := db.Prepare("INSERT INTO StudentsCareerFairs(StudentID, CareerFairID, displayname, major, class) VALUES((SELECT ID FROM Students WHERE idnumber = ?), (SELECT MAX(ID) FROM CareerFairs), ?, ?, ?);")
+        stmt, err := db.Prepare("INSERT INTO StudentsCareerFairs(StudentID, CareerFairID, displayname, major, class) VALUES((SELECT ID FROM Students WHERE HEX(idnumber) = ?), (SELECT MAX(ID) FROM CareerFairs), ?, ?, ?);")
         res, err := stmt.Exec(idnumber, displayname, major, class)
         _ = res
         if err != nil {
@@ -262,7 +313,7 @@ func addStudentToCurrentCareerFair(db *sql.DB, displayname string, major string,
 }
 
 func addEmployersToCurrentCareerFair(db *sql.DB, name string) (bool, error) {
-        stmt, err := db.Prepare("INSERT INTO EmployersCareerFairs(EmployerID, CareerFairID) SELECT e.ID, c.ID FROM Employers e, CareerFairs c WHERE c.ID = MAX(ID) AND e.name = ?;")
+        stmt, err := db.Prepare("INSERT INTO CareerFairsEmployers(EmployerID, CareerFairID) SELECT e.ID, c.ID FROM Employers e, CareerFairs c WHERE e.name = ? AND c.ID = (SELECT MAX(ID) FROM CareerFairs);")
         res, err := stmt.Exec(name)
         _ = res
         if err != nil {
@@ -271,50 +322,85 @@ func addEmployersToCurrentCareerFair(db *sql.DB, name string) (bool, error) {
         return true, nil;
 }
 
-func getNumberOfStudents(db *sql.DB, fairname string) (int, error) {
+func GetNumberOfStudents(db *sql.DB, fairname string) (int, error) {
 	var (
                 numStudents int
         )
-        stmt, err := db.Prepare("SELECT COUNT(DISTINCT(StudentID)) FROM StudentsCareerFairs WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE fairname);")
+        stmt, err := db.Prepare("SELECT COUNT(DISTINCT(StudentID)) FROM StudentsCareerFairs WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE ?);")
         if err != nil {
                 return -1, err
         }
         defer stmt.Close()
-        rows, err := stmt.Query()
+        err = stmt.QueryRow(fairname).Scan(&numStudents)
         if err != nil {
                 return -1, err
-        }
-        defer rows.Close()
-        err = rows.Scan(&numStudents)
-        if err != nil {
-                return -1, err
-        }
-        if err = rows.Err(); err != nil {
-                return -1 , err
         }
         return numStudents, nil
 }
 
-func getNumberOfInterviews(db *sql.DB, fairname string) (int, error) {
+func GetNumberOfInterviews(db *sql.DB, fairname string) (int, error) {
         var (
                 numInterviews int
         )
-        stmt, err := db.Prepare("SELECT COUNT(StudentID) FROM Interviews WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE fairname);")
+        stmt, err := db.Prepare("SELECT COUNT(StudentID) FROM Interviews WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE ?);")
         if err != nil {
                 return -1, err
         }
         defer stmt.Close()
-        rows, err := stmt.Query()
+        err = stmt.QueryRow(fairname).Scan(&numInterviews)
         if err != nil {
-                return -1, err
-        }
-        defer rows.Close()
-        err = rows.Scan(&numInterviews)
-        if err != nil {
-                return -1, err
-        }
-        if err = rows.Err(); err != nil {
                 return -1, err
         }
         return numInterviews, nil
+}
+
+func StartCareerFair(db *sql.DB, name string, comments string) (bool, error) {
+	stmt, err := db.Prepare("INSERT INTO CareerFairs (name, comments) VALUES( ?, ?);")
+        if err != nil {
+                return false, err
+        }
+        res, err := stmt.Exec(name, comments)
+        _ = res
+        if err != nil {
+                return false, err
+        }
+        return true, nil
+}
+
+func ShowEmployersInterviewing(db *sql.DB, fairname string) ([]string, error) {
+        var (
+                name string
+        )
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT DISTINCT(EmployerID) FROM Interviews WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE ?));")
+        if err != nil {
+                return nil, err
+        }
+        defer stmt.Close()
+        rows, err := stmt.Query(fairname)
+        if err != nil {
+                return nil, err
+        }
+        defer rows.Close()
+        employers := make([]string, 0, 10)
+        for rows.Next() {
+                err := rows.Scan(&name)
+                if err != nil {
+                        return nil, err
+                }
+                employers = append(employers, name)
+        }
+        if err = rows.Err(); err != nil {
+                return nil, err
+        }
+        return employers, nil
+}
+
+func UpdateEmployerName(db *sql.DB, oldname string, newname string) (bool, error) {
+        stmt, err := db.Prepare("UPDATE Employers SET name = ? WHERE name = ?")
+        res, err := stmt.Exec(newname, oldname)
+        _ = res
+        if err != nil {
+                return false, err
+        }
+        return true, nil
 }
