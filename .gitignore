@@ -24,3 +24,6 @@
 # Ignore swp files
 *.swp
 
+# Ignore secret files
+configs/secret/
+
