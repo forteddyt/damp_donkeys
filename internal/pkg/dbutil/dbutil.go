@@ -85,17 +85,14 @@ func AddStudent(db *sql.DB, displayname string, major string, class string, idnu
     if err !=  nil {
         return false, err;  
     }
-    if err != nil {
-        return false, err;
-    }
     if !isValidStudent {
         stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(UNHEX(?));")
-            res, err := stmt.Exec(idnumber)
+        res, err := stmt.Exec(idnumber)
         _ = res
-            if err != nil {
-                    return false, err;
+        if err != nil {
+            return false, err;
         }
-        }
+    }
     isAddedStudent, err := addStudentToCurrentCareerFair(db, displayname, major, class, idnumber)
     if !isAddedStudent || err != nil {
         return false, err;
@@ -108,12 +105,12 @@ func AddInterview(db *sql.DB, idnumber string, employername string) (bool, error
     if err != nil {
         return false, err
     }
-        res, err := stmt.Exec(idnumber, employername)
+    res, err := stmt.Exec(idnumber, employername)
     _ = res
-        if err != nil {
-                return false, err
-        }
-        return true, nil
+    if err != nil {
+            return false, err
+    }
+    return true, nil
 }
 //Test Methods Below
 func ShowStudents(db *sql.DB, employername string) ([]Interview, error) {

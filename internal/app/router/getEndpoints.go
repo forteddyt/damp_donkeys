@@ -15,13 +15,44 @@ import(
 )
 
 func GetCompanyList(w http.ResponseWriter, r *http.Request){
-	log.Print("Serving companyList")
+	params := r.URL.Query()
 	
-	// Temporary until db function is written
-	temp := [3]string{"Company 1", "Company 2", "Long named company example"}
-	w.WriteHeader(http.StatusOK)
 
-	json.NewEncoder(w).Encode(temp)
+	// -> ERROR HANDLING
+	log.Printf("company_list api called with [%s]\n", params)
+	if len(params) > 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	
+	DBUsername, DBPassword, err := confidante.DBCredentials()
+	if err != nil {
+		log.Printf("Could not obtain Database credentials: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	dbconn, err := dbutil.OpenDB(DBName, DBUsername, DBPassword)
+	if err != nil {
+		log.Printf("Database connection failed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer dbutil.CloseDB(dbconn)
+	companies, err := dbutil.ShowEmployersToStudents(dbconn)
+
+	// Database request error
+	if err != nil {
+		log.Printf("Could not get interviewing companies from database: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resp := &resp.GetCompanyList {
+		CompanyList: companies,
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
 }
 
 func GetStudent(w http.ResponseWriter, r *http.Request){

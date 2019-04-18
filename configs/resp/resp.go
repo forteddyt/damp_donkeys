@@ -25,6 +25,10 @@ type GetCareerFairList struct {
 	JWT string `json:"jwt"`
 }
 
+type GetCompanyList struct {
+	CompanyList []string `json:"company_list"`
+}
+
 type PutCompany struct {
 	CompanyName string `json:"company_name`
 	UserCode string `json:"user_code"`
