@@ -396,8 +396,24 @@ func ShowEmployersInterviewing(db *sql.DB, fairname string) ([]string, error) {
 }
 
 func UpdateEmployerName(db *sql.DB, oldname string, newname string) (bool, error) {
-        stmt, err := db.Prepare("UPDATE Employers SET name = ? WHERE name = ?")
-        res, err := stmt.Exec(newname, oldname)
+        stmt, err := db.Prepare("UPDATE Employers SET name = ? WHERE name = ?;")
+        if err != nil {
+		return false, err;
+	}
+	res, err := stmt.Exec(newname, oldname)
+        _ = res
+        if err != nil {
+                return false, err
+        }
+        return true, nil
+}
+
+func DeleteEmployer(db *sql.DB, empname string, fairname string) (bool, error)  {
+        stmt, err := db.Prepare("DELETE FROM CareerFairsEmployers WHERE EmployerID = (SELECT ID FROM Employers WHERE name = ?) AND CareerFairID = (SELECT ID FROM CareerFairs WHERE name = ?);")
+        if err != nil {
+                return false, err
+        }
+        res, err := stmt.Exec(empname, fairname)
         _ = res
         if err != nil {
                 return false, err
