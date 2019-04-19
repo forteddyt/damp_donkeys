@@ -1,16 +1,8 @@
 <div id="companies_div">
   <h1>Current Companies</h1>
-  <table id="companies_table">
-    <tr>
-      <th (click)="viewRedirect($event)">Company 1</th>
-    </tr>
-    <tr>
-      <th (click)="viewRedirect($event)">Company 2</th>
-    </tr>
-    <tr>
-      <th (click)="viewRedirect($event)">Company 3</th>
-    </tr>
-  </table>
+  <div class="company_container">
+    <ng-template #companyInsert></ng-template>
+  </div>
   <br/>
   <button (click)="backRedirect($event)">Back</button>
   <button (click)="addRedirect($event)">Add Company</button>

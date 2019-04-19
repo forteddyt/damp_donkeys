@@ -9,12 +9,15 @@ import { Router} from '@angular/router';
 
 export class ViewCompanyComponent implements OnInit {
 	stateData
+	companyName
 	constructor(private router: Router) {
 		this.stateData = this.router.getCurrentNavigation().extras.state;
-		if(this.stateData == null || this.stateData.jwt == null){
+		if(this.stateData == null || this.stateData.jwt == null
+			|| this.stateData.companyName == null){
 			//console.log("Invalid state has been passed (or not passed at all);"+this.stateData);
 			this.router.navigateByUrl('/admin');
 		}
+		this.companyName = this.stateData.companyName
 	}
 
 	ngOnInit() {

@@ -18,6 +18,7 @@ import { AddCompanyComponent } from './components/add-company/add-company.compon
 import { ViewCompanyComponent } from './components/view-company/view-company.component';
 import bootstrap from "bootstrap";
 import { InterviewComponent } from './components/interview/interview.component';
+import { CompanyNameTileComponent } from './components/company-name-tile/company-name-tile.component';
 
 @NgModule({
   declarations: [
@@ -35,11 +36,13 @@ import { InterviewComponent } from './components/interview/interview.component';
     AddCompanyComponent,
     ViewCompanyComponent,
     SelectCompanyTileComponent,
-    InterviewComponent
+    InterviewComponent,
+    CompanyNameTileComponent
   ],
   entryComponents: [
     SelectCompanyTileComponent,
-    InterviewComponent
+    InterviewComponent,
+    CompanyNameTileComponent
   ],
   imports: [
     BrowserModule,
