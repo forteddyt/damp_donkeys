@@ -120,7 +120,7 @@ func PutCompany(w http.ResponseWriter, r *http.Request){
 	err = nil
 	var userCode string
 	var attempts int
-	for attempts = 0; attempts < 10 && err == nil && !addedCompany; attempts++ {
+	for attempts = 0; attempts < 10 && !addedCompany; attempts++ {
 		userCode = genCodeHelper(UserCodeLength)
 		hashedUserCode := hashHelper(userCode)
 		log.Printf("hashedUserCode: %x\n", hashedUserCode)
