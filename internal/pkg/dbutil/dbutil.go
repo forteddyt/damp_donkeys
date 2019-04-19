@@ -174,7 +174,7 @@ func ShowEmployersToStudents(db *sql.DB) ([]string, error) {
         var (
                 name string
         )
-        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT EmployerID FROM CareerFairsEmployers WHERE CareerFairID = (SELECT MAX(ID) FROM CareerFairs));")
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT EmployerID FROM CareerFairsEmployers WHERE CareerFairID = (SELECT MAX(ID) FROM CareerFairs)); ORDER BY name DESC")
         if err != nil {
                 return nil, err
         }
