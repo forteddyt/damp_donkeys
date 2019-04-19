@@ -156,6 +156,7 @@ func PutResetCode(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 
 	// -> ERROR HANDLING
+	log.Printf("reset_code api called with [%s]\n", params)
 	if len(params["company_name"]) == 0 || params["company_name"][0] == "" ||
 		len(params["jwt"]) == 0 || params["jwt"][0] == "" {
 		log.Printf("Missing paramaters\n")
@@ -164,10 +165,16 @@ func PutResetCode(w http.ResponseWriter, r *http.Request){
 	}
 	company_name := params["company_name"][0]
 
-	statusCode, new_jwt := tokenRefreshHelper(params["jwt"][0], company_name, JWTDuration)
-	if statusCode != 0 {
-		w.WriteHeader(statusCode)
-		return
+	new_jwt := ""
+	if DBName == "dev" { // Give free rein in development database
+		new_jwt = params["jwt"][0]
+	} else {
+		statusCode, n_jwt := tokenRefreshHelper(params["jwt"][0], "admin", JWTDuration)
+		new_jwt = n_jwt
+		if statusCode != 0 {
+			w.WriteHeader(statusCode)
+			return
+		}
 	}
 
 	DBUsername, DBPassword, err := confidante.DBCredentials()
