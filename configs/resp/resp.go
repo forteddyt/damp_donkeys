@@ -11,8 +11,8 @@ type GetCompanyCheckIn struct {
 }
 
 type GetStudent struct {
-	DisplayName string `json:"dispName` // Change this to 'disp_name' to be more json-ic
-	Major string `json:"major`
+	DisplayName string `json:"display_name"`
+	Major string `json:"major"`
 	Class string `json:"class"`
 }
 
