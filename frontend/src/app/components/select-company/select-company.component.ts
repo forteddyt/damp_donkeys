@@ -29,7 +29,7 @@ export class SelectCompanyComponent implements AfterViewInit {
     const resp = await this.getCompanies();
 
     //console.log(resp.status)
-    this.companyList = resp.body;
+    this.companyList = resp.body["company_list"];
     this.loadComponents()
   }
 
