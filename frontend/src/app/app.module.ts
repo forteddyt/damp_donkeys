@@ -15,7 +15,6 @@ import { AdminWelcomeComponent } from './components/admin-welcome/admin-welcome.
 import { CompanyEditorComponent } from './components/company-editor/company-editor.component';
 import { StatisticsComponent } from './components/statistics/statistics.component';
 import { AddCompanyComponent } from './components/add-company/add-company.component';
-import { ViewCompanyComponent } from './components/view-company/view-company.component';
 import bootstrap from "bootstrap";
 import { InterviewComponent } from './components/interview/interview.component';
 import { CompanyNameTileComponent } from './components/company-name-tile/company-name-tile.component';
@@ -34,7 +33,6 @@ import { CompanyNameTileComponent } from './components/company-name-tile/company
     CompanyEditorComponent,
     StatisticsComponent,
     AddCompanyComponent,
-    ViewCompanyComponent,
     SelectCompanyTileComponent,
     InterviewComponent,
     CompanyNameTileComponent

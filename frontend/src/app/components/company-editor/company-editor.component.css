@@ -4,5 +4,10 @@
 
 .company_container {
 	margin: auto;
-	max-width: 250px;
+	max-width: 600px;
+}
+
+.space{
+	margin-left: 3px;
+	margin-right: 3px;
 }

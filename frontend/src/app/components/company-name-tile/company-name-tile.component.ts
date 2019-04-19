@@ -12,8 +12,12 @@ export class CompanyNameTileComponent  {
   stateData
   constructor(private router: Router) { }
 
-  viewRedirect(event: any){
-    this.stateData.companyName = this.companyName
-    this.router.navigateByUrl('/admin/companies/view', { state: this.stateData })
+  genNewCode(event: any){
+    // Make api call to code generator api here
+    alert("New code is: ")
+  }
+
+  deleteCompany(event: any){
+    alert("Deleted company (but not really yet)")
   }
 }
