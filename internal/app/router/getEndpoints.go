@@ -208,10 +208,16 @@ func GetCareerFairList(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	statusCode, new_jwt := tokenRefreshHelper(params["jwt"][0], "admin", JWTDuration)
-	if statusCode != 0 {
-		w.WriteHeader(statusCode)
-		return
+	new_jwt := ""
+	if DBName == "dev" { // Give free rein in development database
+		new_jwt = params["jwt"][0]
+	} else {
+		statusCode, n_jwt := tokenRefreshHelper(params["jwt"][0], "admin", JWTDuration)
+		new_jwt = n_jwt
+		if statusCode != 0 {
+			w.WriteHeader(statusCode)
+			return
+		}
 	}
 
 	DBUsername, DBPassword, err := confidante.DBCredentials()
