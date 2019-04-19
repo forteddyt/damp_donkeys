@@ -27,17 +27,6 @@ export class CompanyUniqueComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.code = this.route.snapshot.params.code;
-    var student = this.http.get("https://csrcint.cs.vt.edu/api/login?password_hash=test").subscribe((res) => {
-      //console.log(res);
-      //var res = await this.getUser();
-      //this.json = res.body["jwt"];
-      this.json = res["jwt"];
-      //this.json_middle = this.json.split('.')[1];
-      var decoded = jwt_decode(this.json);
-      //console.log(decoded);
-      this.company_name = decoded['user'];
-    });
 
     //console.log(this.api_call_return['interviewees'][0]['name']);
     //console.log(this.json_middle);
@@ -55,11 +44,25 @@ export class CompanyUniqueComponent implements OnInit {
 
   getUser()
   {
-    return this.http.get("https://csrcint.cs.vt.edu/api/login?password_hash=test", {observe: 'response'}).toPromise();
+    return this.http.get("https://csrcint.cs.vt.edu/api/login?code=EDH75", {observe: 'response'}).toPromise();
   }
 
+  //login()
+  //{
+    //return this.http.get("https://csrcint.cs.vt.edu/api/login?password_hash=test", {observe: 'response'}).toPromise();
+      //console.log(res);
+      //var res = await this.getUser();
+      //this.json = res.body["jwt"];
+      //this.json = res["jwt"];
+      //this.json_middle = this.json.split('.')[1];
+      //var decoded = jwt_decode(this.json);
+      //console.log(decoded);
+      //this.company_name = decoded['user'];
+  //}
 
   async ngAfterViewInit() {
+
+    this.code = this.route.snapshot.params.code;
     //const resp = /*await*/ this.getNames();
 
     //console.log(resp.status)
@@ -71,6 +74,12 @@ export class CompanyUniqueComponent implements OnInit {
     //var res = await this.getUser();
 
     //console.log(this.json);
+    const r = await this.getUser();
+
+    this.json = r.body['jwt'];
+    var decoded = jwt_decode(this.json);
+    this.company_name = decoded['user'];
+
     const resp = await this.getNames();
 
     //console.log(resp.status);
