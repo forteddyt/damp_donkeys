@@ -30,7 +30,7 @@ type GetCompanyList struct {
 }
 
 type PutCompany struct {
-	CompanyName string `json:"company_name`
+	CompanyName string `json:"company_name"`
 	UserCode string `json:"user_code"`
 	JWT string `json:"jwt"`
 }
