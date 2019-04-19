@@ -44,7 +44,7 @@ export class CompanyUniqueComponent implements OnInit {
 
   getUser()
   {
-    return this.http.get("https://csrcint.cs.vt.edu/api/login?code=EDH75", {observe: 'response'}).toPromise();
+    return this.http.get("https://csrcint.cs.vt.edu/api/login?code=" + this.code, {observe: 'response'}).toPromise();
   }
 
   //login()
@@ -63,6 +63,7 @@ export class CompanyUniqueComponent implements OnInit {
   async ngAfterViewInit() {
 
     this.code = this.route.snapshot.params.code;
+    //console.log(this.code);
     //const resp = /*await*/ this.getNames();
 
     //console.log(resp.status)
