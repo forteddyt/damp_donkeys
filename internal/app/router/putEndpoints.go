@@ -88,10 +88,16 @@ func PutCompany(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	statusCode, new_jwt := tokenRefreshHelper(params["jwt"][0], "admin", JWTDuration)
-	if statusCode != 0 {
-		w.WriteHeader(statusCode)
-		return
+	new_jwt := ""
+	if DBName == "dev" { // Give free rein in development database
+		new_jwt = params["jwt"][0]
+	} else {
+		statusCode, n_jwt := tokenRefreshHelper(params["jwt"][0], "admin", JWTDuration)
+		new_jwt = n_jwt
+		if statusCode != 0 {
+			w.WriteHeader(statusCode)
+			return
+		}
 	}
 
 	DBUsername, DBPassword, err := confidante.DBCredentials()
@@ -117,6 +123,7 @@ func PutCompany(w http.ResponseWriter, r *http.Request){
 	for attempts = 0; attempts < 10 && err == nil && !addedCompany; attempts++ {
 		userCode = genCodeHelper(UserCodeLength)
 		hashedUserCode := hashHelper(userCode)
+		log.Printf("hashedUserCode: %x\n", hashedUserCode)
 
 		addedCompany, err = dbutil.AddEmployer(dbconn, params["company_name"][0], hashedUserCode)
 	}

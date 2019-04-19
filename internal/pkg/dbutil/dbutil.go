@@ -1,6 +1,7 @@
 package dbutil
 
 import (
+    "log"
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
 )
@@ -52,10 +53,11 @@ func AddEmployer(db *sql.DB, name string, password string) (bool, error) {
         return false, err
     }
     if !isValidEmployer {
-        stmt, err := db.Prepare("INSERT INTO Employers(name, password) VALUES(?, UNHEX(?));")
+        stmt, err := db.Prepare("INSERT INTO Employers(name, password) VALUES(?, ?);")
         res, err := stmt.Exec(name, password)
         _ = res
         if err != nil {
+            log.Printf("given password is: %x\n", password)
             return false, err
         }
     }
@@ -67,7 +69,7 @@ func AddEmployer(db *sql.DB, name string, password string) (bool, error) {
 }
 
 func CheckStudent(db *sql.DB, idnumber string) (bool, error){
-    stmt, err := db.Prepare("SELECT ID FROM Students WHERE HEX(idnumber) = ?;")
+    stmt, err := db.Prepare("SELECT ID FROM Students WHERE idnumber = ?;")
     if err != nil {
         return false, err
     }
@@ -86,7 +88,7 @@ func AddStudent(db *sql.DB, displayname string, major string, class string, idnu
         return false, err;  
     }
     if !isValidStudent {
-        stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(UNHEX(?));")
+        stmt, err := db.Prepare("INSERT INTO Students(idnumber) VALUES(?);")
         res, err := stmt.Exec(idnumber)
         _ = res
         if err != nil {
@@ -101,7 +103,7 @@ func AddStudent(db *sql.DB, displayname string, major string, class string, idnu
 }
 
 func AddInterview(db *sql.DB, idnumber string, employername string) (bool, error)  {
-    stmt, err := db.Prepare("INSERT INTO Interviews (StudentID, EmployerID, CareerFairID) SELECT s.ID, e.ID, c.ID FROM Students s, Employers e, CareerFairs c WHERE HEX(s.idnumber) = ? AND e.Name = ? AND c.ID = (SELECT MAX(ID) FROM CareerFairs);")
+    stmt, err := db.Prepare("INSERT INTO Interviews (StudentID, EmployerID, CareerFairID) SELECT s.ID, e.ID, c.ID FROM Students s, Employers e, CareerFairs c WHERE s.idnumber = ? AND e.Name = ? AND c.ID = (SELECT MAX(ID) FROM CareerFairs);")
     if err != nil {
         return false, err
     }
@@ -146,7 +148,7 @@ func ShowStudents(db *sql.DB, employername string) ([]Interview, error) {
 //Need to Test Methods Below
 func CheckPasswordHash(db *sql.DB, passhash string) (string, error) {
     var name string
-    stmt, err := db.Prepare("SELECT name FROM Employers WHERE HEX(password) = ?")
+    stmt, err := db.Prepare("SELECT name FROM Employers WHERE password = ?")
     if err != nil {
         return "", err
     }
@@ -227,7 +229,7 @@ func ShowCareerFairsByName(db *sql.DB) ([]string, error) {
 }
 
 func UpdatePassword(db *sql.DB, name string, password string) (bool, error) {
-        stmt, err := db.Prepare("UPDATE Employers SET password = UNHEX(?) WHERE name = ?")
+        stmt, err := db.Prepare("UPDATE Employers SET password = ? WHERE name = ?")
         res, err := stmt.Exec(password, name)
         _ = res
         if err != nil {
@@ -244,7 +246,7 @@ func addStudentToCurrentCareerFair(db *sql.DB, displayname string, major string,
 	if isAdded {
 		return false, nil;
 	}
-        stmt, err := db.Prepare("INSERT INTO StudentsCareerFairs(StudentID, CareerFairID, displayname, major, class) VALUES((SELECT ID FROM Students WHERE HEX(idnumber) = ?), (SELECT MAX(ID) FROM CareerFairs), ?, ?, ?);")
+        stmt, err := db.Prepare("INSERT INTO StudentsCareerFairs(StudentID, CareerFairID, displayname, major, class) VALUES((SELECT ID FROM Students WHERE idnumber = ?), (SELECT MAX(ID) FROM CareerFairs), ?, ?, ?);")
         res, err := stmt.Exec(idnumber, displayname, major, class)
         _ = res
         if err != nil {
@@ -363,7 +365,7 @@ func DeleteEmployer(db *sql.DB, empname string, fairname string) (bool, error)  
 }
 
 func CheckStudentsCareerFairs(db *sql.DB, idnumber string) (bool, error){
-    stmt, err := db.Prepare("SELECT StudentID FROM StudentsCareerFairs WHERE StudentID = (SELECT ID FROM Students WHERE HEX(idnumber) = ?);")
+    stmt, err := db.Prepare("SELECT StudentID FROM StudentsCareerFairs WHERE StudentID = (SELECT ID FROM Students WHERE idnumber = ?);")
     if err != nil {
         return false, err
     }
