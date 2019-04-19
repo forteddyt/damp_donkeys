@@ -3,7 +3,11 @@
   <div class="company_container">
     <ng-template #companyInsert></ng-template>
   </div>
-  <br/>
-  <button class="space" (click)="backRedirect($event)">Back</button>
-  <button class="space" (click)="addRedirect($event)">Add Company</button>
+  <div class="company_container">
+	  <input class="alignLeft space" placeholder="Enter Company Name" (keyup)="onKey($event)">
+	  <button class="alignRight space" (click)="addCompany($event)">Add Company</button>
+  </div>
+  <div class="company_container">
+    <button class="space" (click)="backRedirect($event)">Back</button>
+  </div>
 </div>

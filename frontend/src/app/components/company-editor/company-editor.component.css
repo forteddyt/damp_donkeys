@@ -1,13 +1,24 @@
 #companies_div {
   text-align: center;
+  max-width: 600px;
+  margin: auto;
 }
 
 .company_container {
-	margin: auto;
-	max-width: 600px;
+	display: block;
+	overflow: auto;
+	margin: 20px;
 }
 
 .space{
 	margin-left: 3px;
 	margin-right: 3px;
+}
+
+.alignLeft{
+	float: left;
+}
+
+.alignRight{
+	float: right;
 }

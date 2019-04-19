@@ -12,6 +12,7 @@ export class CompanyEditorComponent implements AfterViewInit {
 	@ViewChild('companyInsert', { read: ViewContainerRef }) companyInsert: ViewContainerRef;
 	stateData
 	companyList
+	newCompanyName
 
 	constructor(private http: HttpClient, private router: Router, private vcr: ViewContainerRef, private cfr: ComponentFactoryResolver) {
 		this.stateData = this.router.getCurrentNavigation().extras.state;
@@ -45,9 +46,41 @@ export class CompanyEditorComponent implements AfterViewInit {
 		}
 	}
 
-	addRedirect(event: any) {
-		// Append companyName to stateData
-		this.router.navigateByUrl('/admin/companies/add', { state: this.stateData })
+	onKey(event: any)
+	{
+		this.newCompanyName = event.target.value;
+	}
+
+	addCompany(event: any){
+		console.log(this.newCompanyName)
+		if (this.newCompanyName == null || this.newCompanyName == ""){
+			alert("Invalid company name")
+		} else {
+			this.addCompanyToDB().then(
+				(val) => { // success
+					console.log(val)
+					this.companyList.push(this.newCompanyName)
+					// resort, ignoring case
+					this.companyList.sort(function (a, b){
+						return a.toLowerCase().localeCompare(b.toLowerCase());
+					})
+					this.stateData.jwt = val["jwt"] // update jwt
+					alert("Company \"" + val["company_name"] + "\" has login code: " + val["user_code"])
+					this.loadComponents()
+				},
+				(err) => { // failure
+					if (err.status == 401){ // invalid jwt for request
+						this.router.navigateByUrl('/admin')
+					} else {
+						alert("Whoops, something broke... status code: " + err.status)
+					}
+				});
+		}
+		// this.router.navigateByUrl('/admin/companies', { state: this.stateData })
+	}
+
+	addCompanyToDB() {
+		return this.http.put("https://csrcint.cs.vt.edu/api/add_company?company_name=" + this.newCompanyName + "&jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
 	}
 
 	backRedirect(event: any){
