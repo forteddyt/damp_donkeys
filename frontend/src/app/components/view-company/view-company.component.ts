@@ -28,4 +28,8 @@ export class ViewCompanyComponent implements OnInit {
 		this.router.navigateByUrl('/admin/companies', { state: this.stateData })
 	}
 
+	generateCode(event: any){
+		// Make api call to code generator api here
+		alert("New code is: ")
+	}
 }
