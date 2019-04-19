@@ -22,4 +22,8 @@ export class StatisticsComponent implements OnInit {
 	viewRedirect(event: any){
 		this.router.navigateByUrl('/admin/nav', { state: this.stateData })
 	}
+
+	backRedirect(event: any){
+		this.router.navigateByUrl('/admin/nav', { state: this.stateData })
+	}
 }

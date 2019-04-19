@@ -26,4 +26,8 @@ export class CompanyEditorComponent {
 		let temp = "temp" // would be whatever user clicked on
 		this.router.navigateByUrl('/admin/companies/view/' + temp, { state: this.stateData })
 	}
+
+	backRedirect(event: any){
+		this.router.navigateByUrl('/admin/nav', { state: this.stateData })
+	}
 }

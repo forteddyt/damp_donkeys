@@ -24,4 +24,8 @@ export class ViewCompanyComponent implements OnInit {
 		this.router.navigateByUrl('/admin/companies', { state: this.stateData })
 	}
 
+	backRedirect(event: any){
+		this.router.navigateByUrl('/admin/companies', { state: this.stateData })
+	}
+
 }

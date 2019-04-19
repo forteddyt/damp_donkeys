@@ -21,4 +21,8 @@ export class AddCompanyComponent implements OnInit {
 	companiesRedirect(event: any){
 		this.router.navigateByUrl('/admin/companies', { state: this.stateData })
 	}
+
+	backRedirect(event: any){
+		this.router.navigateByUrl('/admin/companies', { state: this.stateData })	
+	}
 }
