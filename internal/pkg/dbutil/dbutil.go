@@ -174,7 +174,7 @@ func ShowEmployersToStudents(db *sql.DB) ([]string, error) {
         var (
                 name string
         )
-        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT EmployerID FROM CareerFairsEmployers WHERE CareerFairID = (SELECT MAX(ID) FROM CareerFairs)) ORDER BY name DESC;")
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT EmployerID FROM CareerFairsEmployers WHERE CareerFairID = (SELECT MAX(ID) FROM CareerFairs)) ORDER BY name ASC;")
         if err != nil {
                 return nil, err
         }
@@ -202,7 +202,7 @@ func ShowCareerFairsByName(db *sql.DB) ([]string, error) {
         var (
                 name string
         )
-        stmt, err := db.Prepare("SELECT name FROM CareerFairs ORDER BY startdate DESC;")
+        stmt, err := db.Prepare("SELECT name FROM CareerFairs ORDER BY startdate ASC;")
         if err != nil {
                 return nil, err
         }
@@ -312,7 +312,7 @@ func ShowEmployersInterviewing(db *sql.DB, fairname string) ([]string, error) {
         var (
                 name string
         )
-        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT DISTINCT(EmployerID) FROM Interviews WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE ?)) ORDER BY name DESC;")
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT DISTINCT(EmployerID) FROM Interviews WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE ?)) ORDER BY name ASC;")
         if err != nil {
                 return nil, err
         }
