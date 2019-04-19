@@ -25,6 +25,7 @@ func Setup() {
 	c := cors.New(cors.Options{
 	    AllowedOrigins: []string{"*"},
 	    AllowCredentials: true,
+	    AllowedMethods: []string{"GET", "DELETE", "PUT", "POST"},
 	    // Enable Debugging for testing, consider disabling in production
 	    Debug: true,
 	})
