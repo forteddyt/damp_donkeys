@@ -1,15 +1,16 @@
 <div id="companies_div">
+  <h1>Current Companies</h1>
   <table id="companies_table">
     <tr>
-      <th [routerLink]="['/admin/companies/view', 'company1']">Company 1</th>
+      <th (click)="viewRedirect($event)">Company 1</th>
     </tr>
     <tr>
-      <th [routerLink]="['/admin/companies/view', 'company2']">Company 2</th>
+      <th (click)="viewRedirect($event)">Company 2</th>
     </tr>
     <tr>
-      <th [routerLink]="['/admin/companies/view', 'company3']">Company 3</th>
+      <th (click)="viewRedirect($event)">Company 3</th>
     </tr>
   </table>
   <br/>
-  <button [routerLink]="['/admin/companies/add']">Add Company</button>
+  <button (click)="addRedirect($event)">Add Company</button>
 </div>

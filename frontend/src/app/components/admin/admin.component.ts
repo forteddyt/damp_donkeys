@@ -25,12 +25,17 @@ export class AdminComponent implements OnInit {
 	{
 		this.http.get("https://csrcint.cs.vt.edu/api/login?code=" + this.code, {observe: 'response'}).subscribe(
 		    resp => {
-		    	var jwt = resp.body["jwt"]
+		    	var jwt = resp.body["jwt"];
+		    	var user = "admin"; // Only the user "admin" should be able to log in
 				var decoded = jwt_decode(jwt);
 
-				// Only the user "admin" should be able to log in
-				if(decoded["user"] == "admin"){
-			    	this.router.navigateByUrl('/admin/nav');
+				let stateData = {
+				  jwt: jwt
+				};
+
+				if(decoded["user"] == user){
+					// this.router.navigate(['/admin/nav'], { state: stateData });
+			    	this.router.navigateByUrl('/admin/nav', {state: stateData});
 				} else {
 					alert("Invalid Code")					
 				}
