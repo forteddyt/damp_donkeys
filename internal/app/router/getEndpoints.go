@@ -145,11 +145,12 @@ func GetLogin(w http.ResponseWriter, r *http.Request){
 	log.Printf("login api called with [%s]\n", params)
 
 	// Client request error
-	if len(params["password_hash"]) == 0 || params["password_hash"][0] == "" {
+	if len(params["code"]) == 0 || params["code"][0] == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	givenPwdHash := params["password_hash"][0]
+	code := params["code"][0]
+	hashedCode := hashHelper(code)
 
 	DBUsername, DBPassword, err := confidante.DBCredentials()
 	if err != nil {
@@ -165,7 +166,7 @@ func GetLogin(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	defer dbutil.CloseDB(dbconn)
-	user, err := dbutil.CheckPasswordHash(dbconn, givenPwdHash) // dbutil.getUser(givenPwdHash)
+	user, err := dbutil.CheckPasswordHash(dbconn, hashedCode)
 
 	// Database request error
 	if err != nil {
@@ -176,7 +177,7 @@ func GetLogin(w http.ResponseWriter, r *http.Request){
 
 	// No user with that password hash was found
 	if user == "" {
-		log.Printf("No user with password hash '%s' found\n", givenPwdHash)
+		log.Printf("No user with code hash %x found\n", hashedCode)
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}

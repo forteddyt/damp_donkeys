@@ -5,7 +5,6 @@ import(
 	"net/http"
 	"math/rand"
 	"crypto/sha1"
-	"encoding/base64"
 
 	"github.com/damp_donkeys/internal/pkg/jwtutil"
 )
@@ -21,7 +20,7 @@ func hashHelper(str string) string {
 	bv := []byte(str)
 	hasher := sha1.New()
 	hasher.Write(bv)
-	return base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+	return string(hasher.Sum(nil))
 }
 
 func genCodeHelper(codeLength int) string {
