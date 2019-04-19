@@ -23,7 +23,7 @@ func Setup() {
 	router.HandleFunc("/delete_company", DeleteCompany).Methods("DELETE")
 
 	c := cors.New(cors.Options{
-	    AllowedOrigins: []string{"https://csrcint.cs.vt.edu"},
+	    AllowedOrigins: []string{"*"},
 	    AllowCredentials: true,
 	    // Enable Debugging for testing, consider disabling in production
 	    Debug: true,
