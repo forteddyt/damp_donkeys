@@ -1,7 +1,6 @@
 package dbutil
 
 import (
-    "log"
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
 )
@@ -57,7 +56,6 @@ func AddEmployer(db *sql.DB, name string, password string) (bool, error) {
         res, err := stmt.Exec(name, password)
         _ = res
         if err != nil {
-            log.Printf("given password is: %x\n", password)
             return false, err
         }
     }
