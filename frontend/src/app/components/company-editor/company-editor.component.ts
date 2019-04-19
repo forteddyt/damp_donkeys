@@ -56,7 +56,7 @@ export class CompanyEditorComponent implements AfterViewInit {
 		if (this.newCompanyName == null || this.newCompanyName == ""){
 			alert("Invalid company name")
 		} else {
-			this.addCompanyToDB().then(
+			this.addCompanyPromise().then(
 				(val) => { // success
 					console.log(val)
 					this.companyList.push(this.newCompanyName)
@@ -76,10 +76,9 @@ export class CompanyEditorComponent implements AfterViewInit {
 					}
 				});
 		}
-		// this.router.navigateByUrl('/admin/companies', { state: this.stateData })
 	}
 
-	addCompanyToDB() {
+	addCompanyPromise() {
 		return this.http.put("https://csrcint.cs.vt.edu/api/add_company?company_name=" + this.newCompanyName + "&jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
 	}
 

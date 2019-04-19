@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 
 @Component({
@@ -10,11 +11,27 @@ import { Router } from '@angular/router';
 export class CompanyNameTileComponent  {
   companyName
   stateData
-  constructor(private router: Router) { }
+  constructor(private http: HttpClient, private router: Router) { }
 
   genNewCode(event: any){
-    // Make api call to code generator api here
-    alert("New code is: ")
+    console.log(this.stateData.jwt)
+    this.genNewCodePromise().then(
+      (val) => { // success
+        this.stateData.jwt = val["jwt"] // update jwt
+        alert("Company \"" + val["company_name"] + "\" has new login code: " + val["user_code"])
+      },
+      (err) => { // failure
+        if (err.status == 401){ // invalid jwt for request
+          this.router.navigateByUrl('/admin')
+          alert("Session expired")
+        } else {
+          alert("Whoops, something broke... status code: " + err.status)
+        }
+      });
+  }
+
+  genNewCodePromise() {
+    return this.http.put("https://csrcint.cs.vt.edu/api/reset_code?company_name=" + this.companyName + "&jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
   }
 
   deleteCompany(event: any){
