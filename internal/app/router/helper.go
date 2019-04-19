@@ -2,6 +2,7 @@ package router
 
 import(
 	"log"
+    "time"
 	"net/http"
 	"math/rand"
 	"crypto/sha1"
@@ -24,6 +25,8 @@ func hashHelper(str string) string {
 }
 
 func genCodeHelper(codeLength int) string {
+    rand.Seed(time.Now().UnixNano())
+
 	// 26 lowercase + 26 uppercase + 10 digit possibilities
 	bv := make([]byte, codeLength)
 
