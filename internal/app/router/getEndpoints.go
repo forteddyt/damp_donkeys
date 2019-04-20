@@ -14,14 +14,65 @@ import(
 	"github.com/damp_donkeys/configs/resp"
 )
 
+func getCompanyListForCareerFair(w http.ResponseWriter, r *http.Request){
+	params := r.URL.Query()
+
+	if len(params) != 2 || len(params["jwt"]) == 0 || params["jwt"][0] == "" ||
+		len(params["career_fair_name"]) == 0 || params["career_fair_name"][0] == ""{
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	new_jwt := ""
+	if DBName == "dev" { // Give free rein in development database
+		new_jwt = params["jwt"][0]
+	} else {
+		statusCode, n_jwt := tokenRefreshHelper(params["jwt"][0], "admin", JWTDuration)
+		new_jwt = n_jwt
+		if statusCode != 0 {
+			w.WriteHeader(statusCode)
+			return
+		}
+	}
+
+	DBUsername, DBPassword, err := confidante.DBCredentials()
+	if err != nil {
+		log.Printf("Could not obtain Database credentials: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	dbconn, err := dbutil.OpenDB(DBName, DBUsername, DBPassword)
+	if err != nil {
+		log.Printf("Database connection failed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer dbutil.CloseDB(dbconn)
+	companies, err := dbutil.ShowEmployersInterviewing(dbconn, params["career_fair_name"][0])
+
+	// Database request error
+	if err != nil {
+		log.Printf("Could not get interviewing companies from database: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	resp := &resp.GetCompanyListForCareerFair {
+		CompanyList: companies,
+		JWT: new_jwt,
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
+}
+
 func GetCompanyList(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
-	
 
 	// -> ERROR HANDLING
 	log.Printf("company_list api called with [%s]\n", params)
 	if len(params) > 0 {
-		w.WriteHeader(http.StatusBadRequest)
+		getCompanyListForCareerFair(w, r)
 		return
 	}
 	
