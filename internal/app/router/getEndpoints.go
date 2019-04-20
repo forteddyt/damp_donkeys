@@ -49,7 +49,7 @@ func getCompanyListForCareerFair(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	defer dbutil.CloseDB(dbconn)
-	companies, err := dbutil.ShowEmployersInterviewing(dbconn, params["career_fair_name"][0])
+	companies, err := dbutil.ShowAllEmployersByCareerFair(dbconn, params["career_fair_name"][0])
 
 	// Database request error
 	if err != nil {
