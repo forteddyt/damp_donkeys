@@ -21,14 +21,13 @@ export class ReviewScreenComponent implements OnInit {
 
   submitInterview(event: any) {
     //console.log("Submit the Interview Details");
-    this.http.put("https://csrcint.cs.vt.edu/api/interview_check_in?",
-      {
-        "company_name": this.stateData.companyName,
-        "display_name": this.stateData.student,
-        "major": this.stateData.major,
-        "class": this.stateData.class,
-        "VT_ID": this.stateData.pid
-      });
-    this.router.navigate(['/complete']);
+    this.http.put("https://csrcint.cs.vt.edu/api/interview_check_in?company_name=" + this.stateData.companyName + "&display_name=" + this.stateData.student + "&major=" + this.stateData.major + "&class=" + this.stateData.class + "&VT_ID=" + this.stateData.pid, {observe: 'response'}).subscribe(
+        resp => {
+          this.router.navigate(['/complete']);
+        },
+        error => {
+          console.log(error)
+        }
+      );
   }
 }

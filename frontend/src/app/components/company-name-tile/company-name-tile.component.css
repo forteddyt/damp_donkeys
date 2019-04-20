@@ -1,0 +1,17 @@
+.companyContainer{
+	display: block;
+	overflow: auto;
+}
+
+.alignLeft{
+	float: left;
+}
+
+.alignRight{
+	float: right;
+}
+
+.space{
+	margin-left: 3px;
+	margin-right: 3px;
+}

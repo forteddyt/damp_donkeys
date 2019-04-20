@@ -37,6 +37,14 @@ export class CompanyWelcomeComponent implements OnInit {
   handleClick(event: any)
   {
     //this.code = "Clicked"
-    this.router.navigateByUrl('/employers/' + this.code);
+    this.http.get("https://csrcint.cs.vt.edu/api/login?code=" + this.code, {observe: 'response'}).subscribe(
+        resp => {
+          this.router.navigateByUrl('/employers/' + this.code);
+        },
+        error => {
+          alert("Invalid Code")
+          console.log(error)
+        }
+      );
   }
 }

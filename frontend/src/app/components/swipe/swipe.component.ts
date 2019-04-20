@@ -34,7 +34,7 @@ export class SwipeComponent implements OnInit {
         this.student_info = res;
         let stateData = {
           pid: this.pid,
-          student: this.student_info.dispName,
+          student: this.student_info.display_name,
           class: this.student_info.class,
           major: this.student_info.major
         }

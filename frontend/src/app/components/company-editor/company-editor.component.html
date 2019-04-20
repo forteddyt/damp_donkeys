@@ -1,15 +1,13 @@
 <div id="companies_div">
-  <table id="companies_table">
-    <tr>
-      <th [routerLink]="['/admin/companies/view', 'company1']">Company 1</th>
-    </tr>
-    <tr>
-      <th [routerLink]="['/admin/companies/view', 'company2']">Company 2</th>
-    </tr>
-    <tr>
-      <th [routerLink]="['/admin/companies/view', 'company3']">Company 3</th>
-    </tr>
-  </table>
-  <br/>
-  <button [routerLink]="['/admin/companies/add']">Add Company</button>
+  <h1>Current Companies</h1>
+  <div class="company_container">
+    <ng-template #companyInsert></ng-template>
+  </div>
+  <div class="company_container">
+	  <input class="alignLeft space" placeholder="Enter Company Name" (keyup)="onKey($event)">
+	  <button class="alignRight space" (click)="addCompany($event)">Add Company</button>
+  </div>
+  <div class="company_container">
+    <button class="space" (click)="backRedirect($event)">Back</button>
+  </div>
 </div>
