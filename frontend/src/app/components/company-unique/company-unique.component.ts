@@ -102,8 +102,8 @@ export class CompanyUniqueComponent implements OnInit {
       //console.log("for loop executed");
       const companyComponent = <InterviewComponent>this.companyInsert.createComponent(cFactory).instance;
 
-      companyComponent.name = this.companyList[i]['name'];
-      companyComponent.time = this.companyList[i]['check-in'];
+      companyComponent.name = this.companyList[i]['student']['display_name'];
+      companyComponent.time = this.companyList[i]['time'];
     }
   }
 }
