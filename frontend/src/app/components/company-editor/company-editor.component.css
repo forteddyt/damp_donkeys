@@ -1,8 +1,6 @@
 #companies_div {
   text-align: center;
   max-width: 600px;
-  /* Same as the width of the sidebar */
-  /*margin-left: 360px; */
   margin: auto;
   padding: 0px 10px;
 }
@@ -20,10 +18,12 @@
 
 .alignLeft{
 	float: left;
+  left: 0;
 }
 
 .alignRight{
 	float: right;
+  right: 0;
 }
 
 .sidenavHeader {
@@ -34,11 +34,10 @@
 /* The sidebar menu */
 .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 360px; /* Set the width of the sidebar */
+  width: 20%; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 0; /* Stay at the top */
-  left: 0;
   background-color: #5D0F0D; /* Black */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 20px;
@@ -48,11 +47,4 @@
 @media screen and (max-height: 450px) {
   .sidenav {padding-top: 15px;}
   .sidenav a {font-size: 18px;}
-}
-
-.sidebarFooter {
-height:40px;
-width:100%;
-    position:absolute;
-    bottom:0;
 }

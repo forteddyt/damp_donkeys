@@ -3,6 +3,7 @@ import { Router} from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CompanyNameTileComponent } from '../company-name-tile/company-name-tile.component';
 import { CareerFairTileComponent } from '../career-fair-tile/career-fair-tile.component'
+import { StatisticsTileComponent } from '../statistics-tile/statistics-tile.component'
 
 @Component({
   selector: 'app-company-editor',
@@ -12,6 +13,7 @@ import { CareerFairTileComponent } from '../career-fair-tile/career-fair-tile.co
 export class CompanyEditorComponent implements OnInit {
 	@ViewChild('companyInsert', { read: ViewContainerRef }) companyInsert: ViewContainerRef;
 	@ViewChild('careerFairInsert', { read: ViewContainerRef }) careerFairInsert: ViewContainerRef;
+	@ViewChild('statsInsert', { read: ViewContainerRef }) statsInsert: ViewContainerRef;
 
 	stateData
 	
@@ -47,6 +49,7 @@ export class CompanyEditorComponent implements OnInit {
 
 		this.loadCompanyComponents()
 		this.loadCareerFairComponents()
+		this.loadStatsComponents()
 	}
 
 	getCompanies() {
@@ -55,6 +58,24 @@ export class CompanyEditorComponent implements OnInit {
 
 	getCareerFairs() {
 		return this.http.get("https://csrcint.cs.vt.edu/api/career_fair_list?jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
+	}
+
+	clearStatsHelper(){
+		this.statsInsert.clear();
+	}
+
+	addStatsHelper(){
+		let cFactory = this.cfr.resolveComponentFactory(StatisticsTileComponent);
+		let statsRef: ComponentRef<StatisticsTileComponent> = this.statsInsert.createComponent(cFactory);
+		let statsComponent = statsRef.instance;
+
+		statsComponent.stateData = this.stateData;
+		statsComponent.careerFairName = this.selectedCareerFair;
+	}
+
+	loadStatsComponents(){
+		this.clearStatsHelper();
+		this.addStatsHelper();
 	}
 
 	clearCareerFairHelper(){
@@ -72,6 +93,7 @@ export class CompanyEditorComponent implements OnInit {
 
 		this.loadCompanyComponents()
 		this.loadCareerFairComponents()
+		this.loadStatsComponents()
 	}
 
 	addCareerFairHelper(careerFairName){

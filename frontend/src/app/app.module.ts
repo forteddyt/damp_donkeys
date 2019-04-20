@@ -13,7 +13,7 @@ import { CompanyWelcomeComponent } from './components/company-welcome/company-we
 import { AdminComponent } from './components/admin/admin.component';
 import { AdminWelcomeComponent } from './components/admin-welcome/admin-welcome.component';
 import { CompanyEditorComponent } from './components/company-editor/company-editor.component';
-import { StatisticsComponent } from './components/statistics/statistics.component';
+import { StatisticsTileComponent } from './components/statistics-tile/statistics-tile.component';
 import bootstrap from "bootstrap";
 import { InterviewComponent } from './components/interview/interview.component';
 import { CompanyNameTileComponent } from './components/company-name-tile/company-name-tile.component';
@@ -31,7 +31,7 @@ import { CareerFairTileComponent } from './components/career-fair-tile/career-fa
     AdminComponent,
     AdminWelcomeComponent,
     CompanyEditorComponent,
-    StatisticsComponent,
+    StatisticsTileComponent,
     SelectCompanyTileComponent,
     InterviewComponent,
     CompanyNameTileComponent,
@@ -41,7 +41,8 @@ import { CareerFairTileComponent } from './components/career-fair-tile/career-fa
     SelectCompanyTileComponent,
     InterviewComponent,
     CompanyNameTileComponent,
-    CareerFairTileComponent
+    CareerFairTileComponent,
+    StatisticsTileComponent
   ],
   imports: [
     BrowserModule,
