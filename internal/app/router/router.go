@@ -11,6 +11,7 @@ func Setup() {
 	router := mux.NewRouter()
 	
 	router.HandleFunc("/company_list", GetCompanyList).Methods("GET")
+	router.HandleFunc("/company_interviewed_list", GetCompanyInterviewedList).Methods("GET")
 	router.HandleFunc("/get_student", GetStudent).Methods("GET")
 	router.HandleFunc("/company_check_ins", GetCompanyCheckIns).Methods("GET")
 	router.HandleFunc("/login", GetLogin).Methods("GET")

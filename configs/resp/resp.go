@@ -34,6 +34,9 @@ type GetCompanyListForCareerFair struct {
 	JWT string `json:"jwt"`
 }
 
+// same as GetCompanyInterviewedList, just different name
+type GetCompanyInterviewedList GetCompanyListForCareerFair
+
 type PutCompany struct {
 	CompanyName string `json:"company_name"`
 	UserCode string `json:"user_code"`
