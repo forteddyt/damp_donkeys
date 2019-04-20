@@ -40,7 +40,7 @@ export class CompanyEditorComponent implements OnInit {
 		
 		resp = await this.getCareerFairs();
 		this.careerFairList = resp.body["career_fair_list"];
-		this.curCareerFair = this.careerFairList[this.careerFairList.length - 1];
+		this.curCareerFair = this.careerFairList[0];
 		this.selectedCareerFair = this.curCareerFair
 		this.stateData.jwt = resp.body["jwt"]; // update jwt
 
