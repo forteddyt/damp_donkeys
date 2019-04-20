@@ -375,3 +375,31 @@ func CheckStudentsCareerFairs(db *sql.DB, idnumber string) (bool, error){
     defer rows.Close()
     return rows.Next(), nil
 }
+
+func ShowAllEmployersByCareerFair(db *sql.DB, fairname string) ([]string, error) {
+        var (
+                name string
+        )
+        stmt, err := db.Prepare("SELECT name FROM Employers WHERE ID IN (SELECT EmployerID FROM CareerFairsEmployers WHERE CareerFairID = (SELECT ID FROM CareerFairs WHERE name LIKE ?)) ORDER BY name ASC;")
+        if err != nil {
+                return nil, err
+        }
+        defer stmt.Close()
+        rows, err := stmt.Query(fairname)
+        if err != nil {
+                return nil, err
+        }
+        defer rows.Close()
+        employers := make([]string, 0, 10)
+        for rows.Next() {
+                err := rows.Scan(&name)
+                if err != nil {
+                        return nil, err
+                }
+                employers = append(employers, name)
+        }
+        if err = rows.Err(); err != nil {
+                return nil, err
+        }
+        return employers, nil
+}
