@@ -1,17 +1,28 @@
-import { Component, AfterViewInit, ComponentFactoryResolver, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, OnInit, ComponentFactoryResolver, ViewChild, ViewContainerRef } from '@angular/core';
 import { Router} from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CompanyNameTileComponent } from '../company-name-tile/company-name-tile.component';
+import { CareerFairTileComponent } from '../career-fair-tile/career-fair-tile.component'
 
 @Component({
   selector: 'app-company-editor',
   templateUrl: './company-editor.component.html',
   styleUrls: ['./company-editor.component.css']
 })
-export class CompanyEditorComponent implements AfterViewInit {
+export class CompanyEditorComponent implements OnInit {
 	@ViewChild('companyInsert', { read: ViewContainerRef }) companyInsert: ViewContainerRef;
+	@ViewChild('careerFairInsert', { read: ViewContainerRef }) careerFairInsert: ViewContainerRef;
+
 	stateData
-	companyList
+	
+	companyList = []
+	companyRefs = []
+	
+	careerFairList = []
+	careerFairRefs = []
+	curCareerFair
+	selectedCareerFair
+	
 	newCompanyName
 
 	constructor(private http: HttpClient, private router: Router, private vcr: ViewContainerRef, private cfr: ComponentFactoryResolver) {
@@ -22,28 +33,116 @@ export class CompanyEditorComponent implements AfterViewInit {
 		}
 	}
 
-	async ngAfterViewInit() {
-		const resp = await this.getCompanies();
-
+	async ngOnInit(){
+		let resp = await this.getCompanies();
 		//console.log(resp.status)
 		this.companyList = resp.body["company_list"];
-		this.loadComponents()
+		
+		resp = await this.getCareerFairs();
+		this.careerFairList = resp.body["career_fair_list"];
+		this.curCareerFair = this.careerFairList[this.careerFairList.length - 1];
+		this.selectedCareerFair = this.curCareerFair
+		this.stateData.jwt = resp.body["jwt"]; // update jwt
+
+
+		this.loadCompanyComponents()
+		this.loadCareerFairComponents()
 	}
 
 	getCompanies() {
 		return this.http.get("https://csrcint.cs.vt.edu/api/company_list", {observe: 'response'}).toPromise();
 	}
 
-	loadComponents() {
-		//console.log(this.companyList)
-		const cFactory = this.cfr.resolveComponentFactory(CompanyNameTileComponent);
-		this.companyInsert.clear();
-		for(var i in this.companyList){
-			const companyComponent = <CompanyNameTileComponent>this.companyInsert.createComponent(cFactory).instance;
+	getCareerFairs() {
+		return this.http.get("https://csrcint.cs.vt.edu/api/career_fair_list?jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
+	}
 
-			companyComponent.companyName = this.companyList[i];
-			companyComponent.stateData = this.stateData;
+	clearCareerFairHelper(){
+		this.careerFairInsert.clear();
+		this.careerFairRefs = [];
+	}
+
+	selectCareerFairHelper(careerFairName, newCompanyList, newJWT){
+		this.clearCareerFairHelper();
+		this.clearCompanyHelper();
+
+		this.selectedCareerFair = careerFairName;
+		this.companyList = newCompanyList;
+		this.stateData.jwt = newJWT;
+
+		this.loadCompanyComponents()
+		this.loadCareerFairComponents()
+	}
+
+	addCareerFairHelper(careerFairName){
+		let cFactory = this.cfr.resolveComponentFactory(CareerFairTileComponent);
+		let careerFairRef: ComponentRef<CareerFairTileComponent> = this.careerFairInsert.createComponent(cFactory);
+		let careerFairComponent = careerFairRef.instance;
+
+		careerFairComponent.careerFairName = careerFairName;
+		careerFairComponent.stateData = this.stateData;
+		careerFairComponent.selfRef = careerFairComponent;
+		
+		// providing parent Component reference to get access to parent class methods
+		careerFairComponent.compInteraction = this;
+
+		// add reference for newly created component
+		this.careerFairRefs.push(careerFairRef);
+	}
+
+	loadCareerFairComponents(){
+		this.clearCareerFairHelper();
+		for(var i in this.careerFairList){
+			this.addCareerFairHelper(this.careerFairList[i]);
 		}
+	}
+
+	clearCompanyHelper(){
+		this.companyInsert.clear();
+		this.companyRefs = [];
+	}
+
+	addCompanyHelper(companyName) {
+		let cFactory = this.cfr.resolveComponentFactory(CompanyNameTileComponent);
+		let companyRef: ComponentRef<CompanyNameTileComponent> = this.companyInsert.createComponent(cFactory);
+		let companyComponent = companyRef.instance;
+
+		companyComponent.companyName = companyName;
+		companyComponent.stateData = this.stateData;
+		companyComponent.selfRef = companyComponent;
+		companyComponent.careerFairName = this.selectedCareerFair;
+		
+		// providing parent Component reference to get access to parent class methods
+		companyComponent.compInteraction = this;
+
+		// add reference for newly created component
+		this.companyRefs.push(companyRef);
+	}
+
+	loadCompanyComponents() {
+		this.clearCompanyHelper();
+		for(var i in this.companyList){
+			this.addCompanyHelper(this.companyList[i]);
+		}
+	}
+
+	deleteCompanyHelper(companyName, newJWT) {
+		if (this.companyInsert.length < 1){
+			return
+		}
+		this.stateData.jwt = newJWT
+
+		let componentRef = this.companyRefs.filter(x => x.instance.companyName == companyName)[0];
+		let component: CompanyNameTileComponent = <CompanyNameTileComponent>componentRef.instance;
+
+		let vcrIndex: number = this.companyInsert.indexOf(componentRef)
+
+		// removing component from container
+		this.companyInsert.remove(vcrIndex);
+
+		// Filter out the now-delete company from both lists
+		this.companyRefs = this.companyRefs.filter(x => x.instance.companyName !== companyName);
+		this.companyList = this.companyList.filter(x => x !== companyName)
 	}
 
 	onKey(event: any)
@@ -52,21 +151,24 @@ export class CompanyEditorComponent implements AfterViewInit {
 	}
 
 	addCompany(event: any){
-		console.log(this.newCompanyName)
 		if (this.newCompanyName == null || this.newCompanyName == ""){
 			alert("Invalid company name")
+		} else if (this.companyList.includes(this.newCompanyName)){
+			alert("Company \"" + this.newCompanyName + "\" is already registered for this career fair")
 		} else {
 			this.addCompanyPromise().then(
 				(val) => { // success
-					console.log(val)
 					this.companyList.push(this.newCompanyName)
+					
 					// resort, ignoring case
 					this.companyList.sort(function (a, b){
 						return a.toLowerCase().localeCompare(b.toLowerCase());
 					})
+					
 					this.stateData.jwt = val["jwt"] // update jwt
+					
 					alert("Company \"" + val["company_name"] + "\" has login code: " + val["user_code"])
-					this.loadComponents()
+					this.loadCompanyComponents()
 				},
 				(err) => { // failure
 					if (err.status == 401){ // invalid jwt for request
@@ -77,6 +179,7 @@ export class CompanyEditorComponent implements AfterViewInit {
 				});
 		}
 	}
+
 
 	addCompanyPromise() {
 		return this.http.put("https://csrcint.cs.vt.edu/api/add_company?company_name=" + this.newCompanyName + "&jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();

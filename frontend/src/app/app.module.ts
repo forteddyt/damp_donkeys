@@ -17,6 +17,7 @@ import { StatisticsComponent } from './components/statistics/statistics.componen
 import bootstrap from "bootstrap";
 import { InterviewComponent } from './components/interview/interview.component';
 import { CompanyNameTileComponent } from './components/company-name-tile/company-name-tile.component';
+import { CareerFairTileComponent } from './components/career-fair-tile/career-fair-tile.component';
 
 @NgModule({
   declarations: [
@@ -33,12 +34,14 @@ import { CompanyNameTileComponent } from './components/company-name-tile/company
     StatisticsComponent,
     SelectCompanyTileComponent,
     InterviewComponent,
-    CompanyNameTileComponent
+    CompanyNameTileComponent,
+    CareerFairTileComponent
   ],
   entryComponents: [
     SelectCompanyTileComponent,
     InterviewComponent,
-    CompanyNameTileComponent
+    CompanyNameTileComponent,
+    CareerFairTileComponent
   ],
   imports: [
     BrowserModule,

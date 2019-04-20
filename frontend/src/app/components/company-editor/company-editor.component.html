@@ -1,11 +1,20 @@
 <div id="companies_div">
-  <h1>Current Companies</h1>
+  <h1 class="space">{{selectedCareerFair}}</h1>
+  <div class="sidenav">
+    <h1 class="space sidenavHeader">Career Fairs</h1>
+    <ng-template #careerFairInsert></ng-template>
+  </div>
+  <br><br>
+  <h4>Registered Companies</h4>
   <div class="company_container">
     <ng-template #companyInsert></ng-template>
   </div>
-  <div class="company_container">
-	  <input class="alignLeft space" placeholder="Enter Company Name" (keyup)="onKey($event)">
-	  <button class="alignRight space" (click)="addCompany($event)">Add Company</button>
+  <div *ngIf="selectedCareerFair == curCareerFair">
+    <h4>Company Registration</h4>
+    <div class="company_container">
+  	  <input class="alignLeft space" placeholder="Enter Company Name" (keyup)="onKey($event)">
+  	  <button class="alignRight space" (click)="addCompany($event)">Add Company</button>
+    </div>
   </div>
   <div class="company_container">
     <button class="space" (click)="backRedirect($event)">Back</button>
