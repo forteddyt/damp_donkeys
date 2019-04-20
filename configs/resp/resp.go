@@ -37,6 +37,13 @@ type GetCompanyListForCareerFair struct {
 // same as GetCompanyInterviewedList, just different name
 type GetCompanyInterviewedList GetCompanyListForCareerFair
 
+type GetCareerFairStats struct {
+	CompanyList []string `json:"company_list"`
+	StudentCount int `json:"student_count"`
+	InterviewCount int `json:"interview_count"`
+	JWT string `json:"jwt"`
+}
+
 type PutCompany struct {
 	CompanyName string `json:"company_name"`
 	UserCode string `json:"user_code"`

@@ -16,6 +16,7 @@ func Setup() {
 	router.HandleFunc("/company_check_ins", GetCompanyCheckIns).Methods("GET")
 	router.HandleFunc("/login", GetLogin).Methods("GET")
 	router.HandleFunc("/career_fair_list", GetCareerFairList).Methods("GET")
+	router.HandleFunc("/career_fair_stats", GetCareerFairStats).Methods("GET")
 
 	router.HandleFunc("/interview_check_in", PutInterviewCheckIn).Methods("PUT")
 	router.HandleFunc("/add_company", PutCompany).Methods("PUT")
