@@ -4,15 +4,19 @@ import(
 	"log"
 
 	"net/http"
+	"encoding/json"
 	
 	"github.com/damp_donkeys/internal/pkg/dbutil"
 	"github.com/damp_donkeys/internal/pkg/confidante"
+	
+	"github.com/damp_donkeys/configs/resp"
 )
 
 func DeleteCompany(w http.ResponseWriter, r *http.Request){
 	params := r.URL.Query()
 
 	// -> ERROR HANDLING
+	log.Printf("delete_endpoints api called with [%s]\n", params)
 	if len(params["company_name"]) == 0 || params["company_name"][0] == "" ||
 	   len(params["career_fair_name"]) == 0 || params["career_fair_name"][0] == "" ||
 		len(params["jwt"]) == 0 || params["jwt"][0] == "" {
@@ -76,5 +80,11 @@ func DeleteCompany(w http.ResponseWriter, r *http.Request){
 	} else {
 		log.Printf("Deleted company from career fair\n")
 	}
+
+	resp := &resp.DeleteCompany {
+		JWT: new_jwt,
+	}
+
 	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(resp)
 }

@@ -38,4 +38,6 @@ type PutCompany struct {
 // Same as AddCompanyResp, just different name
 type PutResetCode PutCompany
 
-
+type DeleteCompany struct {
+	JWT string `json:"jwt"`
+}
