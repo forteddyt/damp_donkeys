@@ -202,7 +202,7 @@ func ShowCareerFairsByName(db *sql.DB) ([]string, error) {
         var (
                 name string
         )
-        stmt, err := db.Prepare("SELECT name FROM CareerFairs ORDER BY startdate ASC;")
+        stmt, err := db.Prepare("SELECT name FROM CareerFairs ORDER BY startdate DESC;")
         if err != nil {
                 return nil, err
         }
