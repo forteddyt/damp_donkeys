@@ -34,8 +34,7 @@ export class AdminComponent implements OnInit {
 				};
 
 				if(decoded["user"] == user){
-					// this.router.navigate(['/admin/nav'], { state: stateData });
-			    	this.router.navigateByUrl('/admin/nav', {state: stateData});
+			    	this.router.navigateByUrl('/admin/companies', {state: stateData});
 				} else {
 					alert("Invalid Code")					
 				}

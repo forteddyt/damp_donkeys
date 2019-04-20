@@ -11,7 +11,6 @@ import { RegistrationCompleteComponent } from './components/registration-complet
 import { CompanyUniqueComponent } from './components/company-unique/company-unique.component';
 import { CompanyWelcomeComponent } from './components/company-welcome/company-welcome.component';
 import { AdminComponent } from './components/admin/admin.component';
-import { AdminWelcomeComponent } from './components/admin-welcome/admin-welcome.component';
 import { CompanyEditorComponent } from './components/company-editor/company-editor.component';
 import { StatisticsTileComponent } from './components/statistics-tile/statistics-tile.component';
 import bootstrap from "bootstrap";
@@ -29,7 +28,6 @@ import { CareerFairTileComponent } from './components/career-fair-tile/career-fa
     CompanyUniqueComponent,
     CompanyWelcomeComponent,
     AdminComponent,
-    AdminWelcomeComponent,
     CompanyEditorComponent,
     StatisticsTileComponent,
     SelectCompanyTileComponent,

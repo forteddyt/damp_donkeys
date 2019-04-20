@@ -208,6 +208,6 @@ export class CompanyEditorComponent implements OnInit {
 	}
 
 	backRedirect(event: any){
-		this.router.navigateByUrl('/admin/nav', { state: this.stateData })
+		this.router.navigateByUrl('/admin')
 	}
 }

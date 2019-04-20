@@ -7,9 +7,7 @@ import { RegistrationCompleteComponent } from './components/registration-complet
 import { CompanyWelcomeComponent } from './components/company-welcome/company-welcome.component';
 import { CompanyUniqueComponent } from './components/company-unique/company-unique.component';
 import { AdminComponent } from './components/admin/admin.component';
-import { AdminWelcomeComponent } from './components/admin-welcome/admin-welcome.component';
 import { CompanyEditorComponent } from './components/company-editor/company-editor.component';
-import { StatisticsTileComponent } from './components/statistics-tile/statistics-tile.component';
 
 const routes: Routes = [
   { path: '', component: SwipeComponent},
@@ -19,9 +17,7 @@ const routes: Routes = [
   { path: 'employers', component: CompanyWelcomeComponent },
   { path: 'employers/:code', component: CompanyUniqueComponent },
   { path: 'admin', component: AdminComponent },
-  { path: 'admin/nav', component: AdminWelcomeComponent },
   { path: 'admin/companies', component: CompanyEditorComponent },
-  { path: 'admin/stats', component: StatisticsTileComponent},
   { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
