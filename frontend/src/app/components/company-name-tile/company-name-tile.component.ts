@@ -15,7 +15,8 @@ export interface editInterface {
 export class CompanyNameTileComponent  {
   companyName
   stateData
-  careerFairName
+  selectedCareerFair
+  curCareerFair
   deleteCompanyHelper
 
   public selfRef: CompanyNameTileComponent
@@ -64,6 +65,6 @@ export class CompanyNameTileComponent  {
   }
 
   deleteCompanyPromise(){
-    return this.http.delete("https://csrcint.cs.vt.edu/api/delete_company?company_name=" + this.companyName + "&career_fair_name=" + this.careerFairName + "&jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
+    return this.http.delete("https://csrcint.cs.vt.edu/api/delete_company?company_name=" + this.companyName + "&career_fair_name=" + this.selectedCareerFair + "&jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
   }
 }

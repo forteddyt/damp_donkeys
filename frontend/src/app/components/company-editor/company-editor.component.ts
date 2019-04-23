@@ -132,7 +132,8 @@ export class CompanyEditorComponent implements OnInit {
 		companyComponent.companyName = companyName;
 		companyComponent.stateData = this.stateData;
 		companyComponent.selfRef = companyComponent;
-		companyComponent.careerFairName = this.selectedCareerFair;
+		companyComponent.selectedCareerFair = this.selectedCareerFair;
+		companyComponent.curCareerFair = this.curCareerFair;
 		
 		// providing parent Component reference to get access to parent class methods
 		companyComponent.compInteraction = this;

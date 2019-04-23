@@ -1,8 +1,10 @@
 <div class="companyContainer">
 	<span>
 		<p class="alignLeft"> {{companyName}} </p>	
-		<button class="alignRight space" (click)="genNewCode($event)">Generate new Code</button>
-		<button class="alignRight space" (click)="deleteCompany($event)">Delete Company</button>
+		<div *ngIf="selectedCareerFair == curCareerFair">
+			<button class="alignRight space" (click)="genNewCode($event)">Generate new Code</button>
+			<button class="alignRight space" (click)="deleteCompany($event)">Delete Company</button>
+		</div>
 	</span>
 </div>
 <br>
