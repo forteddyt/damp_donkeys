@@ -174,6 +174,21 @@ func PutCompany(w http.ResponseWriter, r *http.Request){
 	}
 	defer dbutil.CloseDB(dbconn)
 
+	exists, err := dbutil.CheckEmployer(dbconn, params["company_name"][0])
+
+	if err != nil {
+		log.Printf("Could not check if employer existed: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// If exists, reset their code
+	if exists {
+		PutResetCode(w, r)
+		return
+	}
+
+
 	// Try to generate a unique code for the company. Try up to 10 times
 	addedCompany := false
 	err = nil
