@@ -120,7 +120,7 @@ func ShowStudents(db *sql.DB, employername string) ([]Interview, error) {
         class string
         date string
     )
-    stmt, err := db.Prepare("SELECT displayname, major, class, DATE_FORMAT(CheckInTime, \"%h:%i\") FROM Interviews INNER JOIN StudentsCareerFairs USING (StudentID) WHERE EmployerID = (SELECT ID FROM Employers WHERE name = ?) AND CareerFairID = MAX(CareerFairID);")
+    stmt, err := db.Prepare("SELECT displayname, major, class, DATE_FORMAT(CheckInTime, \"%h:%i\") FROM Interviews INNER JOIN StudentsCareerFairs USING (StudentID) WHERE EmployerID = (SELECT ID FROM Employers WHERE name = ?);")
     if err != nil {
         return nil, err
     }
