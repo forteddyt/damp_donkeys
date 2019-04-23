@@ -30,7 +30,7 @@ func Setup() {
 	    AllowCredentials: true,
 	    AllowedMethods: []string{"GET", "DELETE", "PUT", "POST"},
 	    // Enable Debugging for testing, consider disabling in production
-	    Debug: true,
+	    // Debug: true,
 	})
 	
 	handler := cors.Default().Handler(router)
