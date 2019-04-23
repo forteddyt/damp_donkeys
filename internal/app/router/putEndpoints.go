@@ -182,13 +182,6 @@ func PutCompany(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	// If exists, reset their code
-	if exists {
-		PutResetCode(w, r)
-		return
-	}
-
-
 	// Try to generate a unique code for the company. Try up to 10 times
 	addedCompany := false
 	err = nil
@@ -213,6 +206,17 @@ func PutCompany(w http.ResponseWriter, r *http.Request){
 		return
 	}
 	// <- END ERROR HANDLING
+	
+	// If already existed, reset their code
+	if exists {
+		_, err = dbutil.UpdatePassword(dbconn, params["company_name"][0], userCode)
+
+		if err != nil {
+			log.Printf("Could not update company code: %s\n", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+	}
 
 	resp := &resp.PutCompany {
 		CompanyName: params["company_name"][0],
