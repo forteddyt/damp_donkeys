@@ -53,6 +53,12 @@ type PutCompany struct {
 // Same as AddCompanyResp, just different name
 type PutResetCode PutCompany
 
+type PutCareerFair struct{
+	CareerFairName string `json:"career_fair_name"`
+	Comments string `json:"comments"`
+	JWT string `json:"jwt"`
+}
+
 type DeleteCompany struct {
 	JWT string `json:"jwt"`
 }

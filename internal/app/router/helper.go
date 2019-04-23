@@ -14,7 +14,7 @@ const(
 	JWTDuration = 30 // In minutes. How long the token will stay valid between requests
 	UserCodeLength = 5 // How long user / company unique codes should be
 	UserCodeChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" // The characters allowed in the unique codes
-	DBName = "dev" // Which database to populate during API requests
+	DBName = "prod" // Which database to populate during API requests
 )
 
 func hashHelper(str string) string {

@@ -21,6 +21,7 @@ func Setup() {
 	router.HandleFunc("/interview_check_in", PutInterviewCheckIn).Methods("PUT")
 	router.HandleFunc("/add_company", PutCompany).Methods("PUT")
 	router.HandleFunc("/reset_code", PutResetCode).Methods("PUT")
+	router.HandleFunc("/career_fair", PutCareerFair).Methods("PUT")
 
 	router.HandleFunc("/delete_company", DeleteCompany).Methods("DELETE")
 
