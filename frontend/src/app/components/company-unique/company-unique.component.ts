@@ -76,7 +76,7 @@ export class CompanyUniqueComponent implements OnInit {
     //console.log(this.json);
     this.getUser().then(
       (resp) => {
-        this.json = r.body['jwt'];
+        this.json = resp['jwt'];
         var decoded = jwt_decode(this.json);
         this.company_name = decoded['user'];
 
