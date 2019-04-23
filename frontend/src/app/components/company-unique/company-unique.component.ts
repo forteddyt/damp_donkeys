@@ -27,7 +27,6 @@ export class CompanyUniqueComponent implements OnInit {
   }
 
   ngOnInit() {
-
     //console.log(this.api_call_return['interviewees'][0]['name']);
     //console.log(this.json_middle);
     //console.log(jwt_decode(this.json));
@@ -75,17 +74,32 @@ export class CompanyUniqueComponent implements OnInit {
     //var res = await this.getUser();
 
     //console.log(this.json);
-    const r = await this.getUser();
+    this.getUser().then(
+      (resp) => {
+        this.json = r.body['jwt'];
+        var decoded = jwt_decode(this.json);
+        this.company_name = decoded['user'];
 
-    this.json = r.body['jwt'];
-    var decoded = jwt_decode(this.json);
-    this.company_name = decoded['user'];
-
-    const resp = await this.getNames();
-
-    //console.log(resp.status);
-    this.companyList = resp.body['students'];
-    this.loadComponents();
+        this.getNames().then(
+          (resp) => {
+            this.companyList = resp['students'];
+            this.loadComponents();
+          },
+          (err) => {
+            if (err.status == 401){
+              alert("Session expired")
+              this.router.navigateByUrl('/employers');
+            }    
+          }
+        );
+      },
+      (err) => {
+        if (err.status == 401){
+          alert("Session expired")
+          this.router.navigateByUrl('/employers');
+        }    
+      }
+    );
   }
 
   getNames()
