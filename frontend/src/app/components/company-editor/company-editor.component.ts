@@ -132,8 +132,13 @@ export class CompanyEditorComponent implements OnInit {
 		} else {
 			this.addCareerFairPromise().then(
 				(val) => {
-					alert("New Career Fair created")
-					this.router.navigateByUrl('/admin/companies', {state: this.stateData})
+					this.clearCareerFairHelper()
+					this.careerFairList.unshift(this.newFairName)
+					this.curCareerFair = this.newFairName
+					this.loadCareerFairComponents()
+
+					// alert("New Career Fair created")
+					// this.router.navigateByUrl('/admin/companies', {state: this.stateData})
 				},
 				(err) => {
 					if (err.status == 401){ // invalid jwt for request
