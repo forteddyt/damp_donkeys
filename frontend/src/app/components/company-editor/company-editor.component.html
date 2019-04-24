@@ -20,6 +20,16 @@
   	  <button class="alignRight space" (click)="addCompany($event)">Add Company</button>
     </div>
   </div>
+  <h4>Career Fair Creation</h4>
+  <div class="company_container">
+    <div>
+      <input class="alignLeft space" placeholder="Enter Career Fair Name" (keyup)="onKeyFairName($event)">
+    </div>
+    <div>
+      <input class="alignLeft space" placeholder="Enter Career Fair Comments" (keyup)="onKeyFairComments($event)">
+      <button class="alignRight space" (click)="addCareerFair($event)">Add Career Fair</button>
+    </div>
+  </div>
   <div class="company_container">
     <button class="space" (click)="backRedirect($event)">Back</button>
   </div>

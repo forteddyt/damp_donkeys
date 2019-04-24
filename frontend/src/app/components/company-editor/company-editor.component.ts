@@ -26,6 +26,8 @@ export class CompanyEditorComponent implements OnInit {
 	selectedCareerFair
 	
 	newCompanyName
+	newFairComments
+	newFairName
 
 	constructor(private http: HttpClient, private router: Router, private vcr: ViewContainerRef, private cfr: ComponentFactoryResolver) {
 		this.stateData = this.router.getCurrentNavigation().extras.state;
@@ -124,6 +126,27 @@ export class CompanyEditorComponent implements OnInit {
 		this.companyRefs = [];
 	}
 
+	addCareerFair(careerFairName){
+		if (this.newFairName == null || this.newFairName == ""){
+			alert("Invalid career fair name")
+		} else {
+			this.addCareerFairPromise().then(
+				(val) => {
+					alert("New Career Fair created")
+					this.router.navigateByUrl('/admin/companies', {state: this.stateData})
+				},
+				(err) => {
+					if (err.status == 401){ // invalid jwt for request
+						alert("Session expired")
+						this.router.navigateByUrl('/admin')
+					} else {
+						alert("Whoops, something broke... status code: " + err.status)
+					}
+				}
+			);
+		}
+	}
+
 	addCompanyHelper(companyName) {
 		let cFactory = this.cfr.resolveComponentFactory(CompanyNameTileComponent);
 		let companyRef: ComponentRef<CompanyNameTileComponent> = this.companyInsert.createComponent(cFactory);
@@ -173,6 +196,16 @@ export class CompanyEditorComponent implements OnInit {
 		this.newCompanyName = event.target.value;
 	}
 
+	onKeyFairComments(event: any)
+	{
+		this.newFairComments = event.target.value;
+	}
+
+	onKeyFairName(event: any)
+	{
+		this.newFairName = event.target.value;
+	}
+
 	addCompany(event: any){
 		if (this.newCompanyName == null || this.newCompanyName == ""){
 			alert("Invalid company name")
@@ -195,6 +228,7 @@ export class CompanyEditorComponent implements OnInit {
 				},
 				(err) => { // failure
 					if (err.status == 401){ // invalid jwt for request
+						alert("Session expired")
 						this.router.navigateByUrl('/admin')
 					} else {
 						alert("Whoops, something broke... status code: " + err.status)
@@ -206,6 +240,10 @@ export class CompanyEditorComponent implements OnInit {
 
 	addCompanyPromise() {
 		return this.http.put("https://csrcint.cs.vt.edu/api/add_company?company_name=" + this.newCompanyName + "&jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
+	}
+
+	addCareerFairPromise(){
+		return this.http.put("https://csrcint.cs.vt.edu/api/career_fair?career_fair_name=" + this.newFairName + "&comments=" + this.newFairComments + "&jwt=" + this.stateData.jwt, {observe: 'response'}).toPromise();
 	}
 
 	backRedirect(event: any){
