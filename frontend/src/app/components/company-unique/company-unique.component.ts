@@ -76,20 +76,20 @@ export class CompanyUniqueComponent implements OnInit {
     //console.log(this.json);
     this.getUser().then(
       (resp) => {
-        this.json = resp['jwt'];
+        this.json = resp.body['jwt'];
         var decoded = jwt_decode(this.json);
         this.company_name = decoded['user'];
 
         this.getNames().then(
           (resp) => {
-            this.companyList = resp['students'];
+            this.companyList = resp.body['students'];
             this.loadComponents();
           },
           (err) => {
             if (err.status == 401){
               alert("Session expired")
               this.router.navigateByUrl('/employers');
-            }    
+            } 
           }
         );
       },
